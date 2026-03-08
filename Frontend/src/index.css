@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base propre pour ton site */
+body {
+  margin: 0;
+  color: #E6EAF2;
+}

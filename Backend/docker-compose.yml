@@ -1,0 +1,79 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: portfolio_mongo
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - portfolio_net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok", "mongodb://root:rootpass@localhost:27017/admin?authSource=admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  mongo-express:
+    image: mongo-express:1
+    container_name: portfolio_mongo_express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    env_file: .env
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: "27017"
+      ME_CONFIG_BASICAUTH: ${ME_CONFIG_BASICAUTH}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - portfolio_net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  seed:
+    image: node:20-alpine
+    container_name: portfolio_seed
+    working_dir: /app
+    env_file: .env
+    environment:
+      MONGO_URI: mongodb://root:rootpass@mongo:27017/${MONGO_DB}?authSource=admin
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./:/app
+      - node_modules_cache:/app/node_modules
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - portfolio_net
+    command: >
+      sh -c "
+        npm ci --prefer-offline &&
+        node script/db/seed.js &&
+        node script/db/seed-projects.fake.js 40
+      "
+    restart: "no"
+
+volumes:
+  mongo_data:
+  node_modules_cache:
+
+networks:
+  portfolio_net:
+    driver: bridge
