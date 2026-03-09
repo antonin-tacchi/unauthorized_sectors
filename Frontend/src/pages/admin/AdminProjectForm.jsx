@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const EMPTY = {
   title: "",
@@ -17,6 +17,8 @@ const EMPTY = {
   tags: "",
   "pricing.cents": "",
 };
+
+const EMPTY_MEDIA_ROW = { url: "", mediaType: "image", role: "gallery" };
 
 function Field({ label, children }) {
   return (
@@ -36,7 +38,7 @@ const selectCls =
   "w-full rounded-lg bg-[#0f1420] border border-white/10 px-3 py-2.5 text-sm text-white outline-none focus:border-[#6b5cff]/60 transition";
 
 export default function AdminProjectForm() {
-  const { id } = useParams(); // undefined = new
+  const { id } = useParams();
   const isEdit = Boolean(id);
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -46,15 +48,25 @@ export default function AdminProjectForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Media management
+  const [mediaRows, setMediaRows] = useState([]);
+  const [removedMediaIds, setRemovedMediaIds] = useState([]);
+
   useEffect(() => {
     if (!isEdit) return;
     (async () => {
       try {
-        const res = await fetch(`${API_URL}/api/projects/id/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Not found");
-        const data = await res.json();
+        const [resProject, resMedia] = await Promise.all([
+          fetch(`${API_URL}/api/projects/id/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_URL}/api/media?projectId=${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (!resProject.ok) throw new Error("Not found");
+        const data = await resProject.json();
         setForm({
           title: data.title || "",
           shortDesc: data.shortDesc || "",
@@ -68,6 +80,18 @@ export default function AdminProjectForm() {
           tags: (data.tags || []).join(", "),
           "pricing.cents": data.pricing?.cents ? String(data.pricing.cents) : "",
         });
+
+        if (resMedia.ok) {
+          const mediaData = await resMedia.json();
+          setMediaRows(
+            mediaData.map((m) => ({
+              _id: m._id,
+              url: m.url,
+              mediaType: m.mediaType || "image",
+              role: m.role || "gallery",
+            }))
+          );
+        }
       } catch {
         setError("Failed to load project.");
       } finally {
@@ -78,6 +102,55 @@ export default function AdminProjectForm() {
 
   function set(key, val) {
     setForm((f) => ({ ...f, [key]: val }));
+  }
+
+  function addMediaRow() {
+    setMediaRows((rows) => [...rows, { ...EMPTY_MEDIA_ROW }]);
+  }
+
+  function updateMediaRow(idx, key, val) {
+    setMediaRows((rows) =>
+      rows.map((r, i) => (i === idx ? { ...r, [key]: val } : r))
+    );
+  }
+
+  function removeMediaRow(idx) {
+    const row = mediaRows[idx];
+    if (row._id) setRemovedMediaIds((ids) => [...ids, row._id]);
+    setMediaRows((rows) => rows.filter((_, i) => i !== idx));
+  }
+
+  async function syncMedia(projectId) {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+
+    await Promise.all([
+      ...removedMediaIds.map((mid) =>
+        fetch(`${API_URL}/api/media/${mid}`, { method: "DELETE", headers })
+      ),
+      ...mediaRows
+        .filter((r) => r.url.trim())
+        .map((r) =>
+          r._id
+            ? fetch(`${API_URL}/api/media/${r._id}`, {
+                method: "PUT",
+                headers,
+                body: JSON.stringify({ url: r.url, mediaType: r.mediaType, role: r.role }),
+              })
+            : fetch(`${API_URL}/api/media`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                  projectId,
+                  url: r.url,
+                  mediaType: r.mediaType,
+                  role: r.role,
+                }),
+              })
+        ),
+    ]);
   }
 
   async function handleSubmit(e) {
@@ -120,6 +193,8 @@ export default function AdminProjectForm() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Error");
+
+      await syncMedia(data._id);
       navigate("/admin/projects");
     } catch (err) {
       setError(err.message);
@@ -129,9 +204,7 @@ export default function AdminProjectForm() {
   }
 
   if (loading) {
-    return (
-      <div className="p-8 text-white/35 animate-pulse">Loading…</div>
-    );
+    return <div className="p-8 text-white/35 animate-pulse">Loading…</div>;
   }
 
   return (
@@ -243,6 +316,64 @@ export default function AdminProjectForm() {
             placeholder="0"
           />
         </Field>
+
+        {/* Media gallery */}
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-semibold uppercase tracking-widest text-white/35">
+              Media gallery
+            </span>
+            <button
+              type="button"
+              onClick={addMediaRow}
+              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 transition"
+            >
+              + Add media
+            </button>
+          </div>
+
+          {mediaRows.length === 0 && (
+            <div className="text-sm text-white/30 py-2">No media — click "Add media" to add images or videos.</div>
+          )}
+
+          <div className="space-y-2">
+            {mediaRows.map((row, idx) => (
+              <div key={idx} className="flex gap-2 items-center">
+                <input
+                  value={row.url}
+                  onChange={(e) => updateMediaRow(idx, "url", e.target.value)}
+                  placeholder="https://… (URL)"
+                  className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-[#6b5cff]/60 transition"
+                />
+                <select
+                  value={row.mediaType}
+                  onChange={(e) => updateMediaRow(idx, "mediaType", e.target.value)}
+                  className="rounded-lg bg-[#0f1420] border border-white/10 px-2 py-2 text-sm text-white outline-none"
+                >
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
+                <select
+                  value={row.role}
+                  onChange={(e) => updateMediaRow(idx, "role", e.target.value)}
+                  className="rounded-lg bg-[#0f1420] border border-white/10 px-2 py-2 text-sm text-white outline-none"
+                >
+                  <option value="gallery">Gallery</option>
+                  <option value="cover">Cover</option>
+                  <option value="before">Before</option>
+                  <option value="after">After</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => removeMediaRow(idx)}
+                  className="rounded-lg bg-red-500/10 border border-red-500/20 px-2.5 py-2 text-xs text-red-400 hover:bg-red-500/20 transition"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {error && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">

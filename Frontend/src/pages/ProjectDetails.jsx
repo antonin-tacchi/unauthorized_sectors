@@ -1,9 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle } from "react-compare-slider";
 import SafeImage from "../components/SafeImage";
+import { useFavorites } from "../context/FavoritesContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+function HeartIcon({ filled }) {
+  return filled ? (
+    <svg viewBox="0 0 24 24" fill="#ef4444" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
 
 function moneyUSD(cents) {
   if (!cents) return "";
@@ -32,9 +46,45 @@ export default function ProjectDetails() {
     const list = [cover, ...fromMedia].filter(Boolean);
     const uniq = [...new Set(list)];
 
-    // fallback (just in case DB is empty, sinon img cassée)
     return uniq.length ? uniq : ["https://picsum.photos/1200/700?random=90"];
   }, [project]);
+
+  // Before / After pour le slider
+  const { beforeImg, afterImg } = useMemo(() => {
+    const mediaItems = Array.isArray(project?.media)
+      ? project.media.filter((m) => m?.mediaType === "image" && m?.url)
+      : [];
+    const before =
+      mediaItems.find((m) => m.role === "before")?.url ||
+      (images.length >= 2 ? images[1] : null);
+    const after =
+      mediaItems.find((m) => m.role === "after")?.url ||
+      (images.length >= 1 ? images[0] : null);
+    return { beforeImg: before, afterImg: after };
+  }, [project, images]);
+
+  const showSlider = beforeImg && afterImg && beforeImg !== afterImg;
+
+  const { favorites, toggle } = useFavorites();
+  const [favCount, setFavCount] = useState(0);
+
+  useEffect(() => {
+    if (project) setFavCount(project.stats?.favorites ?? 0);
+  }, [project]);
+
+  function handleFav() {
+    if (!project) return;
+    const id = String(project._id);
+    const wasFav = favorites.has(id);
+    toggle(id);
+    setFavCount((c) => (wasFav ? Math.max(0, c - 1) : c + 1));
+    fetch(`${API_URL}/api/projects/${id}/${wasFav ? "unfavorite" : "favorite"}`, {
+      method: "POST",
+    }).catch(() => {
+      toggle(id);
+      setFavCount((c) => (wasFav ? c + 1 : Math.max(0, c - 1)));
+    });
+  }
 
   const [activeImg, setActiveImg] = useState(0);
   const [tab, setTab] = useState("overview"); // overview | features | technical
@@ -113,14 +163,12 @@ export default function ProjectDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-[1.45fr_1fr] gap-6">
         {/* Left: Gallery */}
         <div className="rounded-2xl border border-white/55 p-4">
-          <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/30">
-            <div className="aspect-[16/9]">
-              <SafeImage
-                src={images[activeImg]}
-                alt={project.title}
-                className="h-full w-full object-cover"
-              />
-            </div>
+          <div className="rounded-xl border border-white/10 bg-black/30">
+            <SafeImage
+              src={images[activeImg]}
+              alt={project.title}
+              className="aspect-[16/9]"
+            />
           </div>
 
           {/* thumbs */}
@@ -138,11 +186,45 @@ export default function ProjectDetails() {
                   ].join(" ")}
                   title="Open image"
                 >
-                  <SafeImage src={url} alt="" className="h-full w-full object-cover" />
+                  <SafeImage src={url} alt="" className="h-full w-full" />
                 </button>
               );
             })}
           </div>
+
+          {/* description */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold">Description</h3>
+            <p className="mt-2 text-white/65 leading-relaxed">
+              {project.description ||
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris."}
+            </p>
+          </div>
+
+          {/* before / after slider */}
+          {showSlider && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3">Before / After</h3>
+              <div className="relative overflow-hidden rounded-xl border border-white/10">
+                <ReactCompareSlider
+                  position={50}
+                  itemOne={<ReactCompareSliderImage src={beforeImg} alt="GTA V" style={{ objectFit: "cover" }} />}
+                  itemTwo={<ReactCompareSliderImage src={afterImg} alt="Custom MLO" style={{ objectFit: "cover" }} />}
+                  handle={
+                    <ReactCompareSliderHandle
+                      buttonStyle={{ backgroundColor: "#5d5bd6", border: "none", color: "white", width: 36, height: 36 }}
+                      linesStyle={{ color: "#5d5bd6", width: 3 }}
+                    />
+                  }
+                  style={{ width: "100%", aspectRatio: "16/9" }}
+                />
+                <div className="pointer-events-none absolute inset-0 flex items-start justify-between p-3">
+                  <span className="rounded bg-black/60 px-2 py-1 text-xs font-semibold text-white">GTA V</span>
+                  <span className="rounded bg-black/60 px-2 py-1 text-xs font-semibold text-white">Custom MLO</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* featured video block */}
           <div className="mt-6">
@@ -156,18 +238,10 @@ export default function ProjectDetails() {
               <SafeImage
                 src={images[0]}
                 alt=""
-                className="h-full w-full object-cover opacity-60"
+                className="h-full w-full"
+                imgClassName="opacity-60"
               />
             </div>
-          </div>
-
-          {/* description */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold">Description</h3>
-            <p className="mt-2 text-white/65 leading-relaxed">
-              {project.description ||
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris."}
-            </p>
           </div>
         </div>
 
@@ -180,6 +254,15 @@ export default function ProjectDetails() {
                 <span>Price {price}</span>
                 <span className="text-white/35">·</span>
                 <span className="text-sm text-white/50">{viewCount ?? project.views ?? 0} views</span>
+                <span className="text-white/35">·</span>
+                <button
+                  onClick={handleFav}
+                  className="flex items-center gap-1.5 transition-transform duration-150 active:scale-125 hover:text-red-400"
+                  title={favorites.has(String(project._id)) ? "Remove from favorites" : "Add to favorites"}
+                >
+                  <HeartIcon filled={favorites.has(String(project._id))} />
+                  <span className="text-xs font-semibold text-white/60">{favCount}</span>
+                </button>
               </div>
               <p className="mt-3 text-white/65 text-sm leading-relaxed">
                 {project.shortDesc ||

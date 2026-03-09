@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
 import AdminRoute from "./routes/AdminRoute";
 
 import Layout from "./layout/Layout";
@@ -24,6 +25,7 @@ import AdminTags from "./pages/admin/AdminTags";
 export default function App() {
   return (
     <AuthProvider>
+      <FavoritesProvider>
       <Routes>
         {/* Public site */}
         <Route path="/" element={<Layout />}>
@@ -55,6 +57,7 @@ export default function App() {
           <Route path="tags" element={<AdminTags />} />
         </Route>
       </Routes>
+      </FavoritesProvider>
     </AuthProvider>
   );
 }

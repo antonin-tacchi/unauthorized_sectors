@@ -58,9 +58,9 @@ function CategoryCard({ title, subtitle, img, to, icon, height = 220, countLabel
       <SafeImage
         src={img}
         alt={title}
-        className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+        className="w-full"
+        imgClassName="transition duration-500 group-hover:scale-[1.03]"
         style={{ height }}
-        loading="lazy"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
 
@@ -88,8 +88,8 @@ function NewCard({ title, date, img, to }) {
       <SafeImage
         src={img}
         alt={title}
-        className="h-[160px] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-        loading="lazy"
+        className="h-[160px] w-full"
+        imgClassName="transition duration-500 group-hover:scale-[1.03]"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
       <div className="absolute bottom-4 left-4 right-4">
@@ -191,7 +191,7 @@ export default function Home() {
           <SafeImage
             src={featured?.image || heroImg}
             alt="Featured project"
-            className="h-[340px] w-full object-cover"
+            className="h-[340px] w-full"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 

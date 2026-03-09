@@ -176,7 +176,7 @@ export async function getProjectBySlug(req, res) {
     // ✅ Attach media (cover + gallery + videos) from DB
     const media = await ProjectMedia.find({ projectId: project._id })
       .sort({ sortOrder: 1, createdAt: 1 })
-      .select({ url: 1, alt: 1, mediaType: 1, provider: 1, isCover: 1, sortOrder: 1 })
+      .select({ url: 1, alt: 1, mediaType: 1, provider: 1, isCover: 1, sortOrder: 1, role: 1 })
       .lean();
 
     // If legacy image missing, pick cover from media
@@ -245,6 +245,36 @@ export async function deleteProject(req, res) {
     const project = await Project.findByIdAndDelete(req.params.id).lean();
     if (!project) return res.status(404).json({ message: "Project not found" });
     return res.json({ message: "Deleted" });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+
+/* ---------------- FAVORITE ---------------- */
+
+export async function favoriteProject(req, res) {
+  try {
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { "stats.favorites": 1 } },
+      { new: true, select: "stats" }
+    ).lean();
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    return res.json({ favorites: project.stats?.favorites ?? 0 });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+
+export async function unfavoriteProject(req, res) {
+  try {
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      [{ $set: { "stats.favorites": { $max: [0, { $subtract: [{ $ifNull: ["$stats.favorites", 0] }, 1] }] } } }],
+      { new: true, select: "stats" }
+    ).lean();
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    return res.json({ favorites: project.stats?.favorites ?? 0 });
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }

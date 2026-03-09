@@ -13,6 +13,8 @@ const projectMediaSchema = new Schema(
     url: { type: String, required: true },
     alt: { type: String, default: "" },
 
+    role: { type: String, enum: ["gallery", "cover", "before", "after"], default: "gallery" },
+
     isCover: { type: Boolean, default: false, index: true },
     sortOrder: { type: Number, default: 0, index: true },
   },

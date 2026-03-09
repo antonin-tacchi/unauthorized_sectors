@@ -37,6 +37,10 @@ const projectSchema = new mongoose.Schema(
     publishedAt: { type: Date, default: Date.now },
 
     views: { type: Number, default: 0 },
+
+    stats: {
+      favorites: { type: Number, default: 0 },
+    },
   },
   { timestamps: true }
 );
