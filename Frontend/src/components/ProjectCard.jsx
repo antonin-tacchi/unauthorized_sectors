@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SafeImage from "./SafeImage";
 
 export default function ProjectCard({ project }) {
   const tags = (project.tags || []).slice(0, 6);
@@ -12,15 +13,15 @@ export default function ProjectCard({ project }) {
 
   return (
     <div className="rounded-2xl border border-white/10 bg-[#101828]/70 px-4 py-4">
-      <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         {/* Image */}
         <Link
           to={`/projects/${project.slug}`}
-          className="relative w-[340px] shrink-0 overflow-hidden rounded-xl bg-black/30 border border-white/10"
+          className="relative w-full md:w-[340px] shrink-0 overflow-hidden rounded-xl bg-black/30 border border-white/10"
         >
           <div className="aspect-[16/9]">
-            <img
-              src={project.image || "https://picsum.photos/900/600?random=42"}
+            <SafeImage
+              src={project.image}
               alt={project.title}
               className="h-full w-full object-cover"
             />
@@ -73,17 +74,17 @@ export default function ProjectCard({ project }) {
         </div>
 
         {/* Right meta */}
-        <div className="w-[190px] shrink-0 border-l border-white/10 pl-4 flex flex-col justify-between">
-          <div className="text-sm text-white/75 space-y-2">
-            <div className="text-white/80">Exterior &amp; Interior</div>
-            <div className="text-white/90 text-base font-semibold">3560</div>
-            <div className="text-white/70">Low</div>
+        <div className="md:w-[190px] shrink-0 md:border-l border-t md:border-t-0 border-white/10 pt-3 md:pt-0 md:pl-4 flex md:flex-col flex-row items-center md:items-stretch justify-between">
+          <div className="text-sm text-white/75 md:space-y-2 flex md:flex-col flex-row gap-4 md:gap-0">
+            <div className="text-white/80 capitalize">{project.mappingType || "—"}</div>
+            <div className="text-white/90 text-base font-semibold capitalize">{project.size || "—"}</div>
+            <div className="text-white/70 capitalize">{project.performance || "—"}</div>
           </div>
 
           <Link
             to={`/projects/${project.slug}`}
-            className="mt-4 inline-flex items-center justify-center rounded-xl bg-[#5d5bd6] px-6 py-3 font-semibold
-                       hover:brightness-110 transition"
+            className="inline-flex items-center justify-center rounded-xl bg-[#5d5bd6] px-6 py-3 font-semibold
+                       hover:brightness-110 transition md:mt-4"
           >
             Details
           </Link>

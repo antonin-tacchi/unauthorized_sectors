@@ -7,50 +7,35 @@ const rawProjects = [
   {
     title: "Military Base MLO",
     type: "mapping",
+    mappingType: "mlo",
+    size: "massive",
+    performance: "optimized",
     description:
-      "Base militaire immersive créée pour FiveM avec zone sécurisée, garage blindé et contrôle d'accès.",
+      "Base militaire immersive créée pour FiveM avec zone sécurisée, garage blindé et contrôle d’accès.",
     image: "https://picsum.photos/1000/600?random=1",
     tags: ["fivem", "mapping", "mlo", "gta"],
   },
   {
     title: "Luxury Penthouse Interior",
     type: "mapping",
+    mappingType: "interior",
+    size: "medium",
+    performance: "optimized",
     description:
       "Penthouse moderne avec vue panoramique, éclairage dynamique et optimisation performance.",
     image: "https://picsum.photos/1000/600?random=2",
     tags: ["interior", "luxury", "gta", "design"],
   },
   {
-    title: "Portfolio React",
-    type: "web",
-    description:
-      "Site portfolio développé en React, Tailwind et NodeJS avec backend MongoDB.",
-    image: "https://picsum.photos/1000/600?random=3",
-    tags: ["react", "tailwind", "node", "mongodb"],
-  },
-  {
-    title: "Discord-like Chat App",
-    type: "web",
-    description:
-      "Application temps réel avec WebSocket permettant discussion et appels vocaux.",
-    image: "https://picsum.photos/1000/600?random=4",
-    tags: ["websocket", "chat", "node", "realtime"],
-  },
-  {
     title: "GTA Underground Bunker",
     type: "mapping",
+    mappingType: "mlo",
+    size: "medium",
+    performance: "balanced",
     description:
       "Bunker souterrain sécurisé avec système de portes animées et lumières dynamiques.",
     image: "https://picsum.photos/1000/600?random=5",
     tags: ["gta", "bunker", "security", "mlo"],
-  },
-  {
-    title: "E-Commerce Instant Gaming Clone",
-    type: "web",
-    description:
-      "Site e-commerce inspiré d’Instant Gaming avec panier, filtres et dashboard admin.",
-    image: "https://picsum.photos/1000/600?random=6",
-    tags: ["ecommerce", "php", "mysql", "frontend"],
   },
 ];
 

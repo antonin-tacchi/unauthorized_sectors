@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import SafeImage from "../components/SafeImage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -102,7 +103,7 @@ export default function ProjectDetails() {
         <div className="rounded-2xl border border-white/55 p-4">
           <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/30">
             <div className="aspect-[16/9]">
-              <img
+              <SafeImage
                 src={images[activeImg]}
                 alt={project.title}
                 className="h-full w-full object-cover"
@@ -125,7 +126,7 @@ export default function ProjectDetails() {
                   ].join(" ")}
                   title="Open image"
                 >
-                  <img src={url} alt="" className="h-full w-full object-cover" />
+                  <SafeImage src={url} alt="" className="h-full w-full object-cover" />
                 </button>
               );
             })}
@@ -140,7 +141,7 @@ export default function ProjectDetails() {
                   <span className="text-white text-2xl">▶</span>
                 </div>
               </div>
-              <img
+              <SafeImage
                 src={images[0]}
                 alt=""
                 className="h-full w-full object-cover opacity-60"
