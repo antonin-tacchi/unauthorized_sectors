@@ -134,6 +134,32 @@ export async function listProjects(req, res) {
   }
 }
 
+/* ---------------- STATS ---------------- */
+
+export async function getProjectStats(req, res) {
+  try {
+    const baseFilter = { type: "mapping", status: "published" };
+
+    const [total, byMappingType] = await Promise.all([
+      Project.countDocuments(baseFilter),
+      Project.aggregate([
+        { $match: baseFilter },
+        { $group: { _id: "$mappingType", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
+    ]);
+
+    return res.json({
+      total,
+      byMappingType: Object.fromEntries(
+        byMappingType.map(({ _id, count }) => [_id ?? "unknown", count])
+      ),
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+
 /* ---------------- GET BY SLUG ---------------- */
 
 export async function getProjectBySlug(req, res) {
@@ -160,6 +186,77 @@ export async function getProjectBySlug(req, res) {
     }
 
     return res.json({ ...project, media });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+
+/* ---------------- INCREMENT VIEW ---------------- */
+
+export async function incrementView(req, res) {
+  try {
+    const project = await Project.findOneAndUpdate(
+      { slug: req.params.slug, type: "mapping" },
+      { $inc: { views: 1 } },
+      { new: true, select: "slug views" }
+    ).lean();
+
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    return res.json({ views: project.views });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+/* ---------------- UPDATE ---------------- */
+
+export async function updateProject(req, res) {
+  try {
+    const payload = { ...req.body };
+    delete payload._id;
+    delete payload.__v;
+    delete payload.createdAt;
+    delete payload.updatedAt;
+
+    if (payload.title)       payload.titleLower  = payload.title.toLowerCase();
+    if (payload.mappingType) payload.mappingType = slugify(payload.mappingType);
+    if (payload.style)       payload.style       = slugify(payload.style);
+    if (payload.size)        payload.size        = slugify(payload.size);
+    if (payload.performance) payload.performance = slugify(payload.performance);
+    if (payload.tags)        payload.tags        = normalizeTags(payload.tags);
+
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      payload,
+      { new: true, runValidators: true }
+    ).lean();
+
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    return res.json(project);
+  } catch (e) {
+    return res.status(400).json({ message: e.message });
+  }
+}
+
+/* ---------------- DELETE ---------------- */
+
+export async function deleteProject(req, res) {
+  try {
+    const project = await Project.findByIdAndDelete(req.params.id).lean();
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    return res.json({ message: "Deleted" });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+
+/* ---------------- GET BY ID ---------------- */
+
+export async function getProjectById(req, res) {
+  try {
+    const project = await Project.findById(req.params.id).lean();
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    return res.json(project);
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }

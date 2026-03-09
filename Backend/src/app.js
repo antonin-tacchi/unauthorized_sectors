@@ -29,6 +29,7 @@ app.use(
 
 app.use("/api", apiRoutes);
 
+
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });

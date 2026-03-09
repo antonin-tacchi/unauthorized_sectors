@@ -12,7 +12,7 @@ export default function ProjectCard({ project }) {
   );
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#101828]/70 px-4 py-4">
+    <div className="rounded-2xl border border-white/10 bg-[#101828]/70 px-4 py-4 transition duration-300 hover:border-[#6b5cff]/40 hover:shadow-[0_0_28px_-8px_rgba(107,92,255,0.35)]">
       <div className="flex flex-col md:flex-row gap-4">
         {/* Image */}
         <Link
@@ -23,7 +23,7 @@ export default function ProjectCard({ project }) {
             <SafeImage
               src={project.image}
               alt={project.title}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
             />
           </div>
 
@@ -84,7 +84,8 @@ export default function ProjectCard({ project }) {
           <Link
             to={`/projects/${project.slug}`}
             className="inline-flex items-center justify-center rounded-xl bg-[#5d5bd6] px-6 py-3 font-semibold
-                       hover:brightness-110 transition md:mt-4"
+                       transition duration-200 hover:brightness-110 hover:-translate-y-0.5
+                       hover:shadow-[0_8px_24px_-8px_rgba(107,92,255,0.7)] md:mt-4"
           >
             Details
           </Link>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import SafeImage from "../components/SafeImage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -15,6 +16,7 @@ export default function ProjectDetails() {
   const [project, setProject] = useState(null);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
+  const [viewCount, setViewCount] = useState(null);
 
   // mock media fallback (tant que tu n’as pas branché project_media)
   const images = useMemo(() => {
@@ -54,6 +56,12 @@ export default function ProjectDetails() {
           setActiveImg(0);
           setTab("overview");
           setStatus("idle");
+
+          // fire-and-forget : increment view counter
+          fetch(`${API_URL}/api/projects/${slug}/view`, { method: "PATCH" })
+            .then((r) => r.json())
+            .then((d) => { if (!cancelled && d?.views != null) setViewCount(d.views); })
+            .catch(() => {});
         }
       } catch (e) {
         if (!cancelled) {
@@ -97,6 +105,10 @@ export default function ProjectDetails() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
+      <Helmet>
+        <title>{project.title} — Antonin TACCHI</title>
+        <meta name="description" content={project.shortDesc || project.description || `${project.title} — FiveM mapping project by Antonin TACCHI.`} />
+      </Helmet>
       {/* top */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.45fr_1fr] gap-6">
         {/* Left: Gallery */}
@@ -164,7 +176,11 @@ export default function ProjectDetails() {
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <h1 className="text-3xl font-semibold truncate">{project.title}</h1>
-              <div className="mt-1 text-white/70">Price {price}</div>
+              <div className="mt-1 flex items-center gap-3 text-white/70">
+                <span>Price {price}</span>
+                <span className="text-white/35">·</span>
+                <span className="text-sm text-white/50">{viewCount ?? project.views ?? 0} views</span>
+              </div>
               <p className="mt-3 text-white/65 text-sm leading-relaxed">
                 {project.shortDesc ||
                   "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut et massa mi. Aliquam in hendrerit urna."}

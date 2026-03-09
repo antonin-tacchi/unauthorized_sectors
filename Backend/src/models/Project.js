@@ -35,6 +35,8 @@ const projectSchema = new mongoose.Schema(
 
     status: { type: String, default: "published", index: true }, // draft|published|archived
     publishedAt: { type: Date, default: Date.now },
+
+    views: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

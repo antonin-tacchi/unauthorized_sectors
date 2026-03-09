@@ -1,7 +1,9 @@
 // src/pages/Projects.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import ProjectCard from "../components/ProjectCard";
+import { useStagger } from "../hooks/useScrollReveal";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -68,6 +70,9 @@ export default function Projects() {
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
+
+  // animate cards on each load (re-triggers when status changes to "idle")
+  const listRef = useStagger(":scope > *", { stagger: 0.1, noScroll: true }, [status]);
 
   const [q, setQ] = useState("");
   const [mappingType, setMappingType] = useState("");
@@ -187,6 +192,10 @@ export default function Projects() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
+      <Helmet>
+        <title>Projects — Antonin TACCHI</title>
+        <meta name="description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
+      </Helmet>
       <div className="px-6 pt-7 pb-6">
         <div className="mt-5 rounded-xl border border-white/10 bg-[#101828]/60 px-4 py-3">
           <div className="flex flex-wrap items-center gap-3">
@@ -247,7 +256,7 @@ export default function Projects() {
               <div className="mt-10 text-white/70">No projects found.</div>
             ) : (
               // ✅ LIST layout (1 column) = matches your horizontal card design
-              <div className="mt-8 space-y-4">
+              <div ref={listRef} className="mt-8 space-y-4">
                 {items.map((p) => (
                   <ProjectCard key={p._id || p.id} project={p} apiUrl={API_URL} />
                 ))}

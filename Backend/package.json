@@ -9,12 +9,14 @@
     "start": "node src/server.js",
     "seed": "node script/db/seed.js",
     "seed:fake": "node script/db/seed-projects.fake.js",
-    "seed:fake:40": "node script/db/seed-projects.fake.js 40"
+    "seed:fake:40": "node script/db/seed-projects.fake.js 40",
+    "create-admin": "node script/db/create-admin.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
