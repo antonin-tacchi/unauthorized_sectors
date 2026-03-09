@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import SafeImage from "../components/SafeImage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -88,7 +89,7 @@ function CategoryCard({ title, subtitle, img, to, icon, height = 220, countLabel
         "bg-white/5 shadow-[0_38px_120px_-80px_rgba(0,0,0,0.95)]",
       ].join(" ")}
     >
-      <img
+      <SafeImage
         src={img}
         alt={title}
         className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
@@ -118,7 +119,7 @@ function NewCard({ title, date, img, to }) {
       to={to}
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5"
     >
-      <img
+      <SafeImage
         src={img}
         alt={title}
         className="h-[160px] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
@@ -225,7 +226,7 @@ export default function Home() {
       {/* HERO / FEATURED */}
       <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_40px_140px_-90px_rgba(0,0,0,0.95)]">
         <div className="relative">
-          <img
+          <SafeImage
             src={featured?.image || heroImg}
             alt="Featured project"
             className="h-[340px] w-full object-cover"

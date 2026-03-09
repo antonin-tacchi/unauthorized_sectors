@@ -15,7 +15,7 @@ services:
     networks:
       - portfolio_net
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok", "mongodb://root:rootpass@localhost:27017/admin?authSource=admin"]
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok", "mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@localhost:27017/admin?authSource=admin"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -52,7 +52,7 @@ services:
     working_dir: /app
     env_file: .env
     environment:
-      MONGO_URI: mongodb://root:rootpass@mongo:27017/${MONGO_DB}?authSource=admin
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DB}?authSource=admin
       NODE_ENV: ${NODE_ENV}
     volumes:
       - ./:/app
