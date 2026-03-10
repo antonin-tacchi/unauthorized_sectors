@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import SafeImage from "./SafeImage";
 import { useFavorites } from "../context/FavoritesContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 function HeartIcon({ filled }) {
   return filled ? (

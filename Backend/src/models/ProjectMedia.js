@@ -7,7 +7,7 @@ const projectMediaSchema = new Schema(
     projectId: { type: Schema.Types.ObjectId, required: true, index: true, ref: "Project" },
     versionId: { type: Schema.Types.ObjectId, default: null, index: true },
 
-    mediaType: { type: String, enum: ["image", "video"], required: true, index: true },
+    mediaType: { type: String, enum: ["image", "video", "model3d"], required: true, index: true },
     provider: { type: String, default: null },
 
     url: { type: String, required: true },

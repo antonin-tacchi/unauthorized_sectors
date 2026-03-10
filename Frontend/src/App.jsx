@@ -1,7 +1,9 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
+import { SettingsProvider } from "./context/SettingsContext";
 import AdminRoute from "./routes/AdminRoute";
 
 import Layout from "./layout/Layout";
@@ -14,17 +16,28 @@ import LegalNotices from "./pages/LegalNotices";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 
-import AdminLogin from "./pages/admin/Login";
-import AdminLayout from "./layout/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
-import AdminProjects from "./pages/admin/AdminProjects";
-import AdminProjectForm from "./pages/admin/AdminProjectForm";
-import AdminFilters from "./pages/admin/AdminFilters";
-import AdminTags from "./pages/admin/AdminTags";
+// Admin — chargés uniquement quand on accède à /admin
+const AdminLogin      = lazy(() => import("./pages/admin/Login"));
+const AdminLayout     = lazy(() => import("./layout/AdminLayout"));
+const Dashboard       = lazy(() => import("./pages/admin/Dashboard"));
+const AdminProjects   = lazy(() => import("./pages/admin/AdminProjects"));
+const AdminProjectForm = lazy(() => import("./pages/admin/AdminProjectForm"));
+const AdminFilters    = lazy(() => import("./pages/admin/AdminFilters"));
+const AdminTags       = lazy(() => import("./pages/admin/AdminTags"));
+const AdminSettings   = lazy(() => import("./pages/admin/AdminSettings"));
+
+function AdminFallback() {
+  return (
+    <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center">
+      <div className="w-6 h-6 rounded-full border-2 border-[#6b5cff] border-t-transparent animate-spin" />
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <AuthProvider>
+      <SettingsProvider>
       <FavoritesProvider>
       <Routes>
         {/* Public site */}
@@ -40,24 +53,28 @@ export default function App() {
         </Route>
 
         {/* Admin */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<Suspense fallback={<AdminFallback />}><AdminLogin /></Suspense>} />
         <Route
           path="/admin"
           element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
+            <Suspense fallback={<AdminFallback />}>
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            </Suspense>
           }
         >
-          <Route index element={<Dashboard />} />
-          <Route path="projects" element={<AdminProjects />} />
-          <Route path="projects/new" element={<AdminProjectForm />} />
-          <Route path="projects/:id/edit" element={<AdminProjectForm />} />
-          <Route path="filters" element={<AdminFilters />} />
-          <Route path="tags" element={<AdminTags />} />
+          <Route index element={<Suspense fallback={null}><Dashboard /></Suspense>} />
+          <Route path="projects" element={<Suspense fallback={null}><AdminProjects /></Suspense>} />
+          <Route path="projects/new" element={<Suspense fallback={null}><AdminProjectForm /></Suspense>} />
+          <Route path="projects/:id/edit" element={<Suspense fallback={null}><AdminProjectForm /></Suspense>} />
+          <Route path="filters" element={<Suspense fallback={null}><AdminFilters /></Suspense>} />
+          <Route path="tags" element={<Suspense fallback={null}><AdminTags /></Suspense>} />
+          <Route path="settings" element={<Suspense fallback={null}><AdminSettings /></Suspense>} />
         </Route>
       </Routes>
       </FavoritesProvider>
+      </SettingsProvider>
     </AuthProvider>
   );
 }

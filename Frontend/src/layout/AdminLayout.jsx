@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const navItems = [
@@ -6,6 +6,7 @@ const navItems = [
   { to: "/admin/projects", label: "Projects", icon: "◫" },
   { to: "/admin/filters", label: "Filters", icon: "⊟" },
   { to: "/admin/tags", label: "Tags", icon: "⊕" },
+  { to: "/admin/settings", label: "Settings", icon: "⚙" },
 ];
 
 export default function AdminLayout() {
@@ -48,8 +49,15 @@ export default function AdminLayout() {
           ))}
         </nav>
 
-        {/* Logout */}
-        <div className="p-3 border-t border-white/8">
+        {/* Bottom actions */}
+        <div className="p-3 border-t border-white/8 space-y-0.5">
+          <Link
+            to="/"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/40 hover:bg-white/5 hover:text-white/70 transition"
+          >
+            <span className="text-base leading-none">←</span>
+            Back to site
+          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/40 hover:bg-white/5 hover:text-red-400 transition"

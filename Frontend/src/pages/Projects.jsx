@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet-async";
 import ProjectCard from "../components/ProjectCard";
 import { useStagger } from "../hooks/useScrollReveal";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 /** Dropdown "Type" = mappingType (mapping-only site) */
 const MAPPING_TYPES = [

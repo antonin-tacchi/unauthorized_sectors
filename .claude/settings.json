@@ -52,7 +52,13 @@
       "Bash(curl -sv -X POST http://localhost:3000/api/contact -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test@example.com\"\",\"\"subject\"\":\"\"Custom MLO\"\",\"\"message\"\":\"\"Hello\"\"}')",
       "Bash(node -e \":*)",
       "Bash(curl -s http://localhost:3000/api/contact-direct)",
-      "Bash(npm install framer-motion gsap)"
+      "Bash(npm install framer-motion gsap)",
+      "Bash(npm install:*)",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__evaluate_script",
+      "Bash(ipconfig)",
+      "Bash(node -e \"const fs=require\\(''fs''\\),path=require\\(''path''\\);function walk\\(d\\){for\\(const f of fs.readdirSync\\(d\\)\\){const p=path.join\\(d,f\\);if\\(fs.statSync\\(p\\).isDirectory\\(\\)\\)walk\\(p\\);else if\\(f.endsWith\\(''.js''\\)||f.endsWith\\(''.jsx''\\)\\){let c=fs.readFileSync\\(p,''utf8''\\);const c2=c.replace\\(/import\\\\.meta\\\\.env\\\\.VITE_API_URL \\\\|\\\\| \"\"http:\\\\/\\\\/localhost:\\\\d+\"\"/g,''import.meta.env.VITE_API_URL || \"\"\"\"''\\);if\\(c!==c2\\){fs.writeFileSync\\(p,c2\\);console.log\\(''updated:'',p\\)}}}}walk\\(''.''\\);\")",
+      "Bash(node fix-api-url.mjs)"
     ]
   }
 }

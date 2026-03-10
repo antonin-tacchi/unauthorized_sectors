@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense as LazySuspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle } from "react-compare-slider";
 import SafeImage from "../components/SafeImage";
 import { useFavorites } from "../context/FavoritesContext";
+const ModelViewer = lazy(() => import("../components/ModelViewer"));
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 function HeartIcon({ filled }) {
   return filled ? (
@@ -32,22 +33,24 @@ export default function ProjectDetails() {
   const [error, setError] = useState("");
   const [viewCount, setViewCount] = useState(null);
 
-  // mock media fallback (tant que tu n’as pas branché project_media)
-  const images = useMemo(() => {
-    const cover = project?.image || "";
-
-    const fromMedia = Array.isArray(project?.media)
+  // Unified gallery items: images + videos + optional 3D slot
+  // Each item: { type: "image"|"video"|"3d", url, role }
+  const galleryItems = useMemo(() => {
+    if (!project) return [];
+    const cover = project.image ? [{ type: "image", url: project.image, role: "cover" }] : [];
+    const fromMedia = Array.isArray(project.media)
       ? project.media
-          .filter((m) => m?.mediaType === "image" && m?.url)
+          .filter((m) => m?.url && (m.mediaType === "image" || m.mediaType === "video"))
           .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-          .map((m) => m.url)
+          .map((m) => ({ type: m.mediaType === "video" ? "video" : "image", url: m.url, role: m.role || "gallery" }))
       : [];
-
-    const list = [cover, ...fromMedia].filter(Boolean);
-    const uniq = [...new Set(list)];
-
-    return uniq.length ? uniq : ["https://picsum.photos/1200/700?random=90"];
+    const model3d = project.modelUrl ? [{ type: "3d", url: project.modelUrl, role: "3d" }] : [];
+    const all = [...cover, ...fromMedia, ...model3d];
+    return all.length ? all : [{ type: "image", url: "https://picsum.photos/1200/700?random=90", role: "gallery" }];
   }, [project]);
+
+  // Backward-compat: images array for before/after slider
+  const images = useMemo(() => galleryItems.filter(i => i.type === "image").map(i => i.url), [galleryItems]);
 
   // Before / After pour le slider
   const { beforeImg, afterImg } = useMemo(() => {
@@ -86,7 +89,8 @@ export default function ProjectDetails() {
     });
   }
 
-  const [activeImg, setActiveImg] = useState(0);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const videoRef = useRef(null);
   const [tab, setTab] = useState("overview"); // overview | features | technical
 
   useEffect(() => {
@@ -103,7 +107,7 @@ export default function ProjectDetails() {
         const data = await res.json();
         if (!cancelled) {
           setProject(data);
-          setActiveImg(0);
+          setActiveIdx(0);
           setTab("overview");
           setStatus("idle");
 
@@ -163,34 +167,71 @@ export default function ProjectDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-[1.45fr_1fr] gap-6">
         {/* Left: Gallery */}
         <div className="rounded-2xl border border-white/55 p-4">
-          <div className="rounded-xl border border-white/10 bg-black/30">
-            <SafeImage
-              src={images[activeImg]}
-              alt={project.title}
-              className="aspect-[16/9]"
-            />
+
+          {/* Main viewer */}
+          <div className="rounded-xl border border-white/10 bg-black/30 overflow-hidden aspect-[16/9]">
+            {(() => {
+              const active = galleryItems[activeIdx];
+              if (!active) return null;
+              if (active.type === "3d") {
+                return (
+                  <LazySuspense fallback={<div className="h-full w-full animate-pulse bg-white/5" />}>
+                    <ModelViewer url={active.url} fallbackImage={images[0]} />
+                  </LazySuspense>
+                );
+              }
+              if (active.type === "video") {
+                return (
+                  <video
+                    ref={videoRef}
+                    key={active.url}
+                    src={active.url}
+                    controls
+                    className="h-full w-full object-contain bg-black"
+                    preload="metadata"
+                  />
+                );
+              }
+              return (
+                <SafeImage
+                  src={active.url}
+                  alt={project.title}
+                  className="h-full w-full"
+                />
+              );
+            })()}
           </div>
 
-          {/* thumbs */}
-          <div className="mt-4 grid grid-cols-4 gap-3">
-            {images.slice(1, 5).map((url, i) => {
-              const idx = i + 1;
-              const isActive = idx === activeImg;
-              return (
-                <button
-                  key={url}
-                  onClick={() => setActiveImg(idx)}
-                  className={[
-                    "overflow-hidden rounded-lg border bg-black/30 aspect-[16/9]",
-                    isActive ? "border-[#5d5bd6]" : "border-white/10 hover:border-white/25",
-                  ].join(" ")}
-                  title="Open image"
-                >
-                  <SafeImage src={url} alt="" className="h-full w-full" />
-                </button>
-              );
-            })}
-          </div>
+          {/* Thumbnails */}
+          {galleryItems.length > 1 && (
+            <div className="mt-4 grid grid-cols-4 gap-3">
+              {galleryItems.slice(0, 8).map((item, idx) => {
+                const isActive = idx === activeIdx;
+                return (
+                  <button
+                    key={`${item.url}-${idx}`}
+                    onClick={() => setActiveIdx(idx)}
+                    className={[
+                      "relative overflow-hidden rounded-lg border bg-black/30 aspect-[16/9]",
+                      isActive ? "border-[#5d5bd6]" : "border-white/10 hover:border-white/25",
+                    ].join(" ")}
+                  >
+                    {item.type === "3d" ? (
+                      <div className="h-full w-full flex items-center justify-center bg-[#0a0d14]">
+                        <span className="text-xs text-[#6b5cff] font-bold">3D</span>
+                      </div>
+                    ) : item.type === "video" ? (
+                      <div className="h-full w-full flex items-center justify-center bg-black/60">
+                        <span className="text-white text-lg">▶</span>
+                      </div>
+                    ) : (
+                      <SafeImage src={item.url} alt="" className="h-full w-full" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* description */}
           <div className="mt-6">
@@ -225,24 +266,6 @@ export default function ProjectDetails() {
               </div>
             </div>
           )}
-
-          {/* featured video block */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold">Featured video</h3>
-            <div className="mt-3 overflow-hidden rounded-xl border border-white/10 bg-black/30 aspect-video relative">
-              <div className="absolute inset-0 grid place-items-center">
-                <div className="h-16 w-16 rounded-2xl bg-[#5d5bd6] grid place-items-center shadow-lg">
-                  <span className="text-white text-2xl">▶</span>
-                </div>
-              </div>
-              <SafeImage
-                src={images[0]}
-                alt=""
-                className="h-full w-full"
-                imgClassName="opacity-60"
-              />
-            </div>
-          </div>
         </div>
 
         {/* Right: Info / CTA / Tabs */}
@@ -301,59 +324,67 @@ export default function ProjectDetails() {
             <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
               {tab === "overview" && (
                 <div className="space-y-3 text-white/75">
-                  <CheckLine>Interior &amp; Exterior</CheckLine>
-                  <CheckLine>Number of props : <span className="text-white">3560</span></CheckLine>
-                  <CheckLine>MLO</CheckLine>
-                  <CheckLine>FPS Impact : <span className="text-white">Low</span></CheckLine>
+                  {project.overview?.length > 0 ? (
+                    project.overview.map((item, i) => <CheckLine key={i}>{item}</CheckLine>)
+                  ) : (
+                    <p className="text-white/35 text-sm italic">No overview defined.</p>
+                  )}
                 </div>
               )}
 
               {tab === "features" && (
                 <div className="space-y-3 text-white/75">
-                  <CheckLine>Optimized collisions</CheckLine>
-                  <CheckLine>Clean LODs</CheckLine>
-                  <CheckLine>Vanilla friendly</CheckLine>
-                  <CheckLine>RP ready</CheckLine>
+                  {project.features?.length > 0 ? (
+                    project.features.map((item, i) => <CheckLine key={i}>{item}</CheckLine>)
+                  ) : (
+                    <p className="text-white/35 text-sm italic">No features defined.</p>
+                  )}
                 </div>
               )}
 
               {tab === "technical" && (
                 <div className="space-y-4 text-white/75">
-                  <div>
-                    <div className="text-white font-semibold">Supported Frameworks</div>
-                    <ul className="mt-2 list-disc pl-5 space-y-1 text-white/70">
-                      <li>ESX</li>
-                      <li>QBCore</li>
-                      <li>Standalone</li>
-                    </ul>
-                  </div>
-
-                  <div className="h-px bg-white/10" />
-
-                  <div>
-                    <div className="text-white font-semibold">RP Category</div>
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-white/70">
-                      <div>EMS</div>
-                      <div className="text-right">Public Service</div>
-                      <div>Medical</div>
+                  {project.technical?.frameworks?.length > 0 && (
+                    <div>
+                      <div className="text-white font-semibold">Supported Frameworks</div>
+                      <ul className="mt-2 list-disc pl-5 space-y-1 text-white/70">
+                        {project.technical.frameworks.map((f, i) => <li key={i}>{f}</li>)}
+                      </ul>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="h-px bg-white/10" />
+                  {project.technical?.categories?.length > 0 && (
+                    <>
+                      <div className="h-px bg-white/10" />
+                      <div>
+                        <div className="text-white font-semibold">RP Category</div>
+                        <div className="mt-2 grid grid-cols-2 gap-2 text-white/70">
+                          {project.technical.categories.slice(0, 4).map((c, i) => <div key={i}>{c}</div>)}
+                        </div>
+                      </div>
+                    </>
+                  )}
 
-                  <div>
-                    <div className="text-white font-semibold">FAQ</div>
-                    <div className="mt-2 space-y-2 text-white/70 text-sm">
+                  {project.technical?.faq?.length > 0 && (
+                    <>
+                      <div className="h-px bg-white/10" />
                       <div>
-                        <div className="text-white/80">Q: Is installation included?</div>
-                        <div>A: Installation instructions are provided. Assistance is available on request.</div>
+                        <div className="text-white font-semibold">FAQ</div>
+                        <div className="mt-2 space-y-2 text-white/70 text-sm">
+                          {project.technical.faq.map((item, i) => (
+                            <div key={i}>
+                              <div className="text-white/80">Q: {item.question}</div>
+                              <div>A: {item.answer}</div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-white/80">Q: Can I request custom modifications?</div>
-                        <div>A: Yes, custom adjustments can be discussed depending on the project scope.</div>
-                      </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
+
+                  {!project.technical?.frameworks?.length && !project.technical?.categories?.length && !project.technical?.faq?.length && (
+                    <p className="text-white/35 text-sm italic">No technical info defined.</p>
+                  )}
                 </div>
               )}
             </div>

@@ -38,6 +38,17 @@ const projectSchema = new mongoose.Schema(
 
     views: { type: Number, default: 0 },
 
+    modelUrl: { type: String, default: "" },
+
+    // Tab content
+    overview: [{ type: String }],
+    features: [{ type: String }],
+    technical: {
+      frameworks: [{ type: String }],
+      categories: [{ type: String }],
+      faq: [{ question: { type: String, default: "" }, answer: { type: String, default: "" } }],
+    },
+
     stats: {
       favorites: { type: Number, default: 0 },
     },
