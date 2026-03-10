@@ -2,8 +2,15 @@ import { Router } from "express";
 import { rateLimit } from "express-rate-limit";
 import {
   createProject,
+  updateProject,
+  deleteProject,
   listProjects,
   getProjectBySlug,
+  getProjectById,
+  getProjectStats,
+  incrementView,
+  favoriteProject,
+  unfavoriteProject,
 } from "../controllers/projects.controller.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -19,7 +26,23 @@ const writeLimiter = rateLimit({
 });
 
 router.get("/", listProjects);
+router.get("/stats", getProjectStats);
+router.get("/id/:id", requireAuth, getProjectById);
 router.get("/:slug", getProjectBySlug);
+router.patch("/:slug/view", incrementView);
+
+const favLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many favorite requests, please try again later." },
+});
+
+router.post("/:id/favorite", favLimiter, favoriteProject);
+router.post("/:id/unfavorite", favLimiter, unfavoriteProject);
 router.post("/", writeLimiter, requireAuth, createProject);
+router.put("/:id", writeLimiter, requireAuth, updateProject);
+router.delete("/:id", writeLimiter, requireAuth, deleteProject);
 
 export default router;

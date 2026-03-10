@@ -1,7 +1,28 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import SafeImage from "./SafeImage";
+import { useFavorites } from "../context/FavoritesContext";
+
+const API_URL = import.meta.env.VITE_API_URL || "";
+
+function HeartIcon({ filled }) {
+  return filled ? (
+    <svg viewBox="0 0 24 24" fill="#ef4444" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
 
 export default function ProjectCard({ project }) {
+  const { favorites, toggle } = useFavorites();
+  const id = String(project._id);
+  const isFav = favorites.has(id);
+  const [favCount, setFavCount] = useState(project.stats?.favorites ?? 0);
+
   const tags = (project.tags || []).slice(0, 6);
   const createdAt = project.createdAt ? new Date(project.createdAt) : null;
   const isNew =
@@ -11,21 +32,34 @@ export default function ProjectCard({ project }) {
     (t) => String(t).toLowerCase() === "popular"
   );
 
+  function handleFav(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const wasFav = favorites.has(id);
+    toggle(id);
+    setFavCount((c) => (wasFav ? Math.max(0, c - 1) : c + 1));
+    fetch(`${API_URL}/api/projects/${id}/${wasFav ? "unfavorite" : "favorite"}`, {
+      method: "POST",
+    }).catch(() => {
+      toggle(id);
+      setFavCount((c) => (wasFav ? c + 1 : Math.max(0, c - 1)));
+    });
+  }
+
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#101828]/70 px-4 py-4">
+    <div className="rounded-2xl border border-white/10 bg-[#101828]/70 px-4 py-4 transition duration-300 hover:border-[#6b5cff]/40 hover:shadow-[0_0_28px_-8px_rgba(107,92,255,0.35)]">
       <div className="flex flex-col md:flex-row gap-4">
         {/* Image */}
         <Link
           to={`/projects/${project.slug}`}
           className="relative w-full md:w-[340px] shrink-0 overflow-hidden rounded-xl bg-black/30 border border-white/10"
         >
-          <div className="aspect-[16/9]">
-            <SafeImage
-              src={project.image}
-              alt={project.title}
-              className="h-full w-full object-cover"
-            />
-          </div>
+          <SafeImage
+            src={project.image}
+            alt={project.title}
+            className="aspect-[16/9]"
+            imgClassName="transition duration-500 group-hover:scale-[1.04]"
+          />
 
           {/* top-left badge */}
           {isNew && (
@@ -33,6 +67,16 @@ export default function ProjectCard({ project }) {
               New
             </span>
           )}
+
+          {/* heart button top-right */}
+          <button
+            onClick={handleFav}
+            className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 backdrop-blur-sm px-2.5 py-1.5 text-white transition-transform duration-150 active:scale-125 hover:bg-black/70"
+            title={isFav ? "Remove from favorites" : "Add to favorites"}
+          >
+            <HeartIcon filled={isFav} />
+            <span className="text-xs font-semibold">{favCount}</span>
+          </button>
 
           {/* bottom-right badge */}
           {isPopular && (
@@ -84,7 +128,8 @@ export default function ProjectCard({ project }) {
           <Link
             to={`/projects/${project.slug}`}
             className="inline-flex items-center justify-center rounded-xl bg-[#5d5bd6] px-6 py-3 font-semibold
-                       hover:brightness-110 transition md:mt-4"
+                       transition duration-200 hover:brightness-110 hover:-translate-y-0.5
+                       hover:shadow-[0_8px_24px_-8px_rgba(107,92,255,0.7)] md:mt-4"
           >
             Details
           </Link>

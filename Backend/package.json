@@ -9,18 +9,26 @@
     "start": "node src/server.js",
     "seed": "node script/db/seed.js",
     "seed:fake": "node script/db/seed-projects.fake.js",
-    "seed:fake:40": "node script/db/seed-projects.fake.js 40"
+    "seed:fake:40": "node script/db/seed-projects.fake.js 40",
+    "create-admin": "node script/db/create-admin.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1005.0",
+    "@gltf-transform/core": "^4.3.0",
+    "@gltf-transform/extensions": "^4.3.0",
+    "@gltf-transform/functions": "^4.3.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
+    "draco3d": "^1.5.7",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
+    "multer": "^2.1.1",
     "slugify": "^1.6.6"
   },
   "devDependencies": {

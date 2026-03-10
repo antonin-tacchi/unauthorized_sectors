@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import SafeImage from "../components/SafeImage";
+import { useReveal, useStagger } from "../hooks/useScrollReveal";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 import heroImg from "../img/HeroPortfolio.webp";
 import mloImg from "../img/MLOPortfolio.jpeg";
@@ -20,42 +22,6 @@ function formatDateFR(isoOrDate) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-/**
- * ✅ Tries to extract a "total count" from whatever shape your API returns
- * Supported examples:
- * - { total: 13, items: [...] }
- * - { count: 13, items: [...] }
- * - { totalItems: 13, items: [...] }
- * - { pagination: { total: 13 } }
- * - { pagination: { totalItems: 13 } }
- * - { meta: { total: 13 } }
- */
-function extractTotal(json) {
-  if (!json || typeof json !== "object") return null;
-
-  const direct =
-    json.total ??
-    json.count ??
-    json.totalItems ??
-    json.total_count ??
-    json.totalCount;
-
-  if (Number.isFinite(direct)) return direct;
-
-  const nested =
-    json.pagination?.total ??
-    json.pagination?.totalItems ??
-    json.meta?.total ??
-    json.meta?.totalItems;
-
-  if (Number.isFinite(nested)) return nested;
-
-  // fallback: if items exists, use length (not ideal but better than nothing)
-  if (Array.isArray(json.items)) return json.items.length;
-  if (Array.isArray(json.data)) return json.data.length;
-
-  return null;
-}
 
 function Pill({ children }) {
   return (
@@ -71,7 +37,7 @@ function GlowButton({ children, className = "", ...props }) {
       {...props}
       className={[
         "inline-flex items-center justify-center rounded-full bg-[#6b5cff] px-8 py-3 text-sm font-semibold text-white",
-        "shadow-[0_22px_70px_-26px_rgba(107,92,255,0.9)] hover:brightness-110 active:brightness-95 transition",
+        "shadow-[0_22px_70px_-26px_rgba(107,92,255,0.9)] hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_28px_80px_-20px_rgba(107,92,255,0.85)] active:brightness-95 active:translate-y-0 transition duration-200",
         className,
       ].join(" ")}
     >
@@ -85,16 +51,16 @@ function CategoryCard({ title, subtitle, img, to, icon, height = 220, countLabel
     <Link
       to={to}
       className={[
-        "group relative overflow-hidden rounded-2xl border border-white/10",
-        "bg-white/5 shadow-[0_38px_120px_-80px_rgba(0,0,0,0.95)]",
+        "group relative overflow-hidden rounded-2xl border border-white/10 transition duration-300",
+        "bg-white/5 shadow-[0_38px_120px_-80px_rgba(0,0,0,0.95)] hover:border-[#6b5cff]/40 hover:shadow-[0_0_32px_-8px_rgba(107,92,255,0.3)]",
       ].join(" ")}
     >
       <SafeImage
         src={img}
         alt={title}
-        className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+        className="w-full"
+        imgClassName="transition duration-500 group-hover:scale-[1.03]"
         style={{ height }}
-        loading="lazy"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
 
@@ -122,8 +88,8 @@ function NewCard({ title, date, img, to }) {
       <SafeImage
         src={img}
         alt={title}
-        className="h-[160px] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-        loading="lazy"
+        className="h-[160px] w-full"
+        imgClassName="transition duration-500 group-hover:scale-[1.03]"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
       <div className="absolute bottom-4 left-4 right-4">
@@ -153,6 +119,12 @@ export default function Home() {
   const [latest, setLatest] = useState([]);
   const [latestStatus, setLatestStatus] = useState("loading");
 
+  // scroll reveal refs (whatsNewRef needs latestStatus, so defined after)
+  const heroRef     = useReveal({ noScroll: true, delay: 0.15 });
+  const catsRef     = useStagger(":scope > *", { stagger: 0.15 });
+  const servicesRef = useReveal();
+  const whatsNewRef = useStagger(":scope > *", { stagger: 0.15 }, [latestStatus]);
+
   // ✅ Featured = latest[0] (si dispo) sinon fallback
   const featured = useMemo(() => latest?.[0] || null, [latest]);
 
@@ -170,39 +142,25 @@ export default function Home() {
       try {
         setLatestStatus("loading");
 
-        // ✅ 1) Latest projects (unchanged spirit: just data fetch)
-        const resLatest = await fetch(`${API_URL}/api/projects?sort=new&page=1&limit=3`);
-        const jsonLatest = await resLatest.json();
+        const [resLatest, resStats] = await Promise.all([
+          fetch(`${API_URL}/api/projects?sort=new&page=1&limit=3`),
+          fetch(`${API_URL}/api/projects/stats`),
+        ]);
+
+        const [jsonLatest, jsonStats] = await Promise.all([
+          resLatest.json(),
+          resStats.json().catch(() => ({})),
+        ]);
+
         if (!resLatest.ok) throw new Error(jsonLatest?.message || "API error");
-
-        // ✅ 2) Counts (parallel)
-        // Adjust mappingType values to YOUR API filter values if needed.
-        // Here: mlo / exterior / rework (dev+mapping) based on your previous links.
-        const urls = {
-          mlo: `${API_URL}/api/projects?mappingType=mlo&page=1&limit=1`,
-          exterior: `${API_URL}/api/projects?mappingType=exterior&page=1&limit=1`,
-          dev: `${API_URL}/api/projects?mappingType=rework&page=1&limit=1`,
-        };
-
-        const [mloRes, exteriorRes, devRes] = await Promise.all([
-          fetch(urls.mlo),
-          fetch(urls.exterior),
-          fetch(urls.dev),
-        ]);
-
-        const [mloJson, exteriorJson, devJson] = await Promise.all([
-          mloRes.json().catch(() => ({})),
-          exteriorRes.json().catch(() => ({})),
-          devRes.json().catch(() => ({})),
-        ]);
 
         if (cancel) return;
 
         setLatest(Array.isArray(jsonLatest.items) ? jsonLatest.items : []);
         setCounts({
-          mlo: extractTotal(mloJson),
-          exterior: extractTotal(exteriorJson),
-          dev: extractTotal(devJson),
+          mlo: jsonStats?.byMappingType?.mlo ?? null,
+          exterior: jsonStats?.byMappingType?.exterior ?? null,
+          dev: jsonStats?.byMappingType?.rework ?? null,
         });
 
         setLatestStatus("idle");
@@ -223,13 +181,17 @@ export default function Home() {
   return (
     // ✅ Élargi ici : max-w-7xl (ou max-w-[1400px] si tu veux encore plus)
     <div className="mx-auto max-w-7xl px-6 pb-12 pt-6">
+      <Helmet>
+        <title>Antonin TACCHI — FiveM Mapping Portfolio</title>
+        <meta name="description" content="Portfolio of Antonin TACCHI, professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
+      </Helmet>
       {/* HERO / FEATURED */}
-      <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_40px_140px_-90px_rgba(0,0,0,0.95)]">
+      <section ref={heroRef} className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_40px_140px_-90px_rgba(0,0,0,0.95)]">
         <div className="relative">
           <SafeImage
             src={featured?.image || heroImg}
             alt="Featured project"
-            className="h-[340px] w-full object-cover"
+            className="h-[340px] w-full"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
@@ -260,7 +222,7 @@ export default function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <section ref={catsRef} className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <CategoryCard
           title="MLO project"
           subtitle="Interior mapping (shop, HQ, bank …)"
@@ -318,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* SERVICES */}
-      <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-10 shadow-[0_40px_140px_-100px_rgba(0,0,0,0.95)]">
+      <section ref={servicesRef} className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-10 shadow-[0_40px_140px_-100px_rgba(0,0,0,0.95)]">
         <div className="text-center text-3xl font-extrabold tracking-tight text-white/90">
           Custom services
         </div>
@@ -349,7 +311,7 @@ export default function Home() {
       <section className="mt-10">
         <h2 className="text-4xl font-extrabold tracking-tight text-white/90">What’s New</h2>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div ref={whatsNewRef} className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
           {latestStatus === "loading" &&
             Array.from({ length: 3 }).map((_, i) => (
               <div
