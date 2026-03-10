@@ -58,7 +58,12 @@
       "mcp__chrome-devtools__evaluate_script",
       "Bash(ipconfig)",
       "Bash(node -e \"const fs=require\\(''fs''\\),path=require\\(''path''\\);function walk\\(d\\){for\\(const f of fs.readdirSync\\(d\\)\\){const p=path.join\\(d,f\\);if\\(fs.statSync\\(p\\).isDirectory\\(\\)\\)walk\\(p\\);else if\\(f.endsWith\\(''.js''\\)||f.endsWith\\(''.jsx''\\)\\){let c=fs.readFileSync\\(p,''utf8''\\);const c2=c.replace\\(/import\\\\.meta\\\\.env\\\\.VITE_API_URL \\\\|\\\\| \"\"http:\\\\/\\\\/localhost:\\\\d+\"\"/g,''import.meta.env.VITE_API_URL || \"\"\"\"''\\);if\\(c!==c2\\){fs.writeFileSync\\(p,c2\\);console.log\\(''updated:'',p\\)}}}}walk\\(''.''\\);\")",
-      "Bash(node fix-api-url.mjs)"
+      "Bash(node fix-api-url.mjs)",
+      "Bash(xargs wc:*)",
+      "Bash(grep -r \"TODO\\\\|FIXME\\\\|BUG\\\\|HACK\\\\|XXX\" /c/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src /c/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Frontend/src --include=*.js --include=*.jsx)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\.claire\\worktrees\\nice-cori\\Frontend\\src\\components"
     ]
   }
 }

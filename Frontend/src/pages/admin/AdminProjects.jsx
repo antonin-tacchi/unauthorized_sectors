@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -40,11 +41,15 @@ export default function AdminProjects() {
     if (!window.confirm(`Delete "${project.title}"?`)) return;
     setDeleting(project._id);
     try {
-      await fetch(`${API_URL}/api/projects/${project._id}`, {
+      const res = await fetch(`${API_URL}/api/projects/${project._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) throw new Error("Delete failed");
+      toast.success(`"${project.title}" deleted`);
       await load(page);
+    } catch (err) {
+      toast.error(err.message || "Delete failed");
     } finally {
       setDeleting(null);
     }

@@ -2,8 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base propre pour ton site */
+/* ── Tokens dark (défaut) ─────────────────────────────────── */
+:root {
+  --bg-base:      #09090b;
+  --bg-surface:   #18181b;
+  --bg-elevated:  #27272a;
+  --text-primary: #e5e5e5;
+  --text-muted:   rgba(255,255,255,0.5);
+  --border:       rgba(255,255,255,0.08);
+  --accent:       #6b5cff;
+}
+
+/* ── Body ─────────────────────────────────────────────────── */
 body {
   margin: 0;
-  color: #E6EAF2;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
 }
+

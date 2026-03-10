@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import { AuthProvider } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
@@ -25,6 +26,7 @@ const AdminProjectForm = lazy(() => import("./pages/admin/AdminProjectForm"));
 const AdminFilters    = lazy(() => import("./pages/admin/AdminFilters"));
 const AdminTags       = lazy(() => import("./pages/admin/AdminTags"));
 const AdminSettings   = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminStats      = lazy(() => import("./pages/admin/AdminStats"));
 
 function AdminFallback() {
   return (
@@ -39,6 +41,21 @@ export default function App() {
     <AuthProvider>
       <SettingsProvider>
       <FavoritesProvider>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: "#18181b",
+            color: "#e5e5e5",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "10px",
+            fontSize: "14px",
+          },
+          success: { iconTheme: { primary: "#22c55e", secondary: "#18181b" } },
+          error:   { iconTheme: { primary: "#ef4444", secondary: "#18181b" } },
+        }}
+      />
       <Routes>
         {/* Public site */}
         <Route path="/" element={<Layout />}>
@@ -71,6 +88,7 @@ export default function App() {
           <Route path="filters" element={<Suspense fallback={null}><AdminFilters /></Suspense>} />
           <Route path="tags" element={<Suspense fallback={null}><AdminTags /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={null}><AdminSettings /></Suspense>} />
+          <Route path="stats"    element={<Suspense fallback={null}><AdminStats /></Suspense>} />
         </Route>
       </Routes>
       </FavoritesProvider>

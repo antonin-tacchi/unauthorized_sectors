@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import ProjectCard from "../components/ProjectCard";
 import { useStagger } from "../hooks/useScrollReveal";
+import { useDebounce } from "../hooks/useDebounce";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -75,6 +76,7 @@ export default function Projects() {
   const listRef = useStagger(":scope > *", { stagger: 0.1, noScroll: true }, [status]);
 
   const [q, setQ] = useState("");
+  const debouncedQ = useDebounce(q, 300);
   const [mappingType, setMappingType] = useState("");
   const [sort, setSort] = useState("new");
 
@@ -114,14 +116,14 @@ export default function Projects() {
   useEffect(() => {
     if (!didInitFromUrl.current) return;
     setPage(1);
-  }, [q, mappingType, sort, style, size, performance, tag]);
+  }, [debouncedQ, mappingType, sort, style, size, performance, tag]);
 
   // 3) Sync state -> URL
   useEffect(() => {
     if (!didInitFromUrl.current) return;
 
     const params = new URLSearchParams();
-    if (q.trim()) params.set("q", q.trim());
+    if (debouncedQ.trim()) params.set("q", debouncedQ.trim());
     if (mappingType) params.set("mappingType", mappingType);
     if (sort) params.set("sort", sort);
 
@@ -135,13 +137,13 @@ export default function Projects() {
     params.set("limit", String(limit));
 
     setSearchParams(params, { replace: true });
-  }, [q, mappingType, sort, style, size, performance, tag, page, limit, setSearchParams]);
+  }, [debouncedQ, mappingType, sort, style, size, performance, tag, page, limit, setSearchParams]);
 
   // 4) queryString -> fetch
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
 
-    if (q.trim()) params.set("q", q.trim());
+    if (debouncedQ.trim()) params.set("q", debouncedQ.trim());
     if (mappingType) params.set("mappingType", mappingType);
     if (sort) params.set("sort", sort);
 
@@ -155,7 +157,7 @@ export default function Projects() {
     params.set("limit", String(limit));
 
     return params.toString();
-  }, [q, mappingType, sort, style, size, performance, tag, page, limit]);
+  }, [debouncedQ, mappingType, sort, style, size, performance, tag, page, limit]);
 
   useEffect(() => {
     let cancelled = false;
@@ -253,7 +255,16 @@ export default function Projects() {
         {status === "idle" && (
           <>
             {items.length === 0 ? (
-              <div className="mt-10 text-white/70">No projects found.</div>
+              <div className="mt-16 flex flex-col items-center gap-3 text-center">
+                <span className="text-4xl opacity-30">🔍</span>
+                <p className="text-white/60 font-medium">No projects found</p>
+                {debouncedQ && (
+                  <p className="text-white/35 text-sm">No results for <span className="text-white/60">"{debouncedQ}"</span></p>
+                )}
+                <button onClick={() => { setQ(""); setMappingType(""); setStyle(""); setSize(""); setPerformance(""); }} className="mt-2 text-xs text-[#6b5cff] hover:text-[#8b7dff] transition">
+                  Clear filters
+                </button>
+              </div>
             ) : (
               // ✅ LIST layout (1 column) = matches your horizontal card design
               <div ref={listRef} className="mt-8 space-y-4">

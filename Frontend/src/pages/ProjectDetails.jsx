@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, lazy, Suspense as LazySuspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 import { ReactCompareSlider, ReactCompareSliderImage, ReactCompareSliderHandle } from "react-compare-slider";
 import SafeImage from "../components/SafeImage";
 import { useFavorites } from "../context/FavoritesContext";
@@ -46,7 +47,7 @@ export default function ProjectDetails() {
       : [];
     const model3d = project.modelUrl ? [{ type: "3d", url: project.modelUrl, role: "3d" }] : [];
     const all = [...cover, ...fromMedia, ...model3d];
-    return all.length ? all : [{ type: "image", url: "https://picsum.photos/1200/700?random=90", role: "gallery" }];
+    return all.length ? all : [{ type: "image", url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%23101828'/%3E%3Cpath d='M6 3.5L10 4.5 8 6z' fill='%23ffffff18'/%3E%3Ccircle cx='10' cy='3' r='1' fill='%23ffffff18'/%3E%3C/svg%3E", role: "gallery" }];
   }, [project]);
 
   // Backward-compat: images array for before/after slider
@@ -157,11 +158,33 @@ export default function ProjectDetails() {
   const price = moneyUSD(project?.pricing?.cents) || "130 $";
   const tags = (project.tags || []).slice(0, 6);
 
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+  const ogImage = project.image || images[0] || "";
+  const ogDesc  = project.shortDesc || project.description || `${project.title} — FiveM mapping project by Antonin TACCHI.`;
+
+  function copyLink() {
+    navigator.clipboard.writeText(pageUrl).then(
+      () => toast.success("Link copied!"),
+      () => toast.error("Failed to copy link")
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <Helmet>
         <title>{project.title} — Antonin TACCHI</title>
-        <meta name="description" content={project.shortDesc || project.description || `${project.title} — FiveM mapping project by Antonin TACCHI.`} />
+        <meta name="description" content={ogDesc} />
+        {/* Open Graph */}
+        <meta property="og:title"       content={`${project.title} — Antonin TACCHI`} />
+        <meta property="og:description" content={ogDesc} />
+        <meta property="og:url"         content={pageUrl} />
+        <meta property="og:type"        content="article" />
+        {ogImage && <meta property="og:image" content={ogImage} />}
+        {/* Twitter Card */}
+        <meta name="twitter:card"        content="summary_large_image" />
+        <meta name="twitter:title"       content={`${project.title} — Antonin TACCHI`} />
+        <meta name="twitter:description" content={ogDesc} />
+        {ogImage && <meta name="twitter:image" content={ogImage} />}
       </Helmet>
       {/* top */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.45fr_1fr] gap-6">
@@ -309,13 +332,23 @@ export default function ProjectDetails() {
           </div>
 
           {/* CTA */}
-          <div className="mt-5">
+          <div className="mt-5 flex gap-2">
             <Link
               to="/contact"
-              className="block w-full rounded-2xl bg-[#5d5bd6] px-6 py-4 text-center font-semibold hover:brightness-110 transition"
+              className="flex-1 block rounded-2xl bg-[#5d5bd6] px-6 py-4 text-center font-semibold hover:brightness-110 transition"
             >
               Contact / Order
             </Link>
+            <button
+              onClick={copyLink}
+              title="Copy link"
+              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white/60 hover:bg-white/10 hover:text-white transition"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
           </div>
 
           {/* Tabs */}

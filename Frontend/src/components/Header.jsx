@@ -1,7 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-
 const KONAMI = [
   "ArrowUp","ArrowUp","ArrowDown","ArrowDown",
   "ArrowLeft","ArrowRight","ArrowLeft","ArrowRight",
@@ -52,6 +51,7 @@ export default function Header() {
             Antonin <span className="text-white">TACCHI</span>
           </NavLink>
 
+          <div className="flex items-center gap-2">
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -65,6 +65,7 @@ export default function Header() {
               <span className={`h-[2px] w-full rounded bg-white/80 transition-all duration-300 origin-center ${open ? "-translate-y-[6px] -rotate-45" : ""}`} />
             </div>
           </button>
+          </div>
         </div>
       </header>
 

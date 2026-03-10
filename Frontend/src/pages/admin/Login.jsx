@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminLogin() {
@@ -20,9 +21,11 @@ export default function AdminLogin() {
 
     try {
       await login(email, password);
+      toast.success("Signed in");
       navigate("/admin", { replace: true });
     } catch (err) {
       setError(err.message || "Login failed");
+      toast.error(err.message || "Login failed");
     } finally {
       setLoading(false);
     }

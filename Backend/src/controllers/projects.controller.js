@@ -2,6 +2,10 @@ import Project from "../models/Project.js";
 import ProjectMedia from "../models/ProjectMedia.js";
 import { generateUniqueSlug } from "../services/slug.service.js";
 
+// Anti-spam vues : Map<"ip:slug" -> timestamp>
+const viewCache = new Map();
+const VIEW_TTL = 60 * 60 * 1000; // 1 heure
+
 function slugify(v) {
   return String(v || "")
     .trim()
@@ -195,8 +199,28 @@ export async function getProjectBySlug(req, res) {
 
 export async function incrementView(req, res) {
   try {
+    const ip   = req.ip || req.headers["x-forwarded-for"] || "unknown";
+    const slug = req.params.slug;
+    const key  = `${ip}:${slug}`;
+    const now  = Date.now();
+
+    // Nettoyage des entrées expirées (throttled)
+    if (viewCache.size > 5000) {
+      for (const [k, ts] of viewCache) {
+        if (now - ts > VIEW_TTL) viewCache.delete(k);
+      }
+    }
+
+    // Si l'IP a déjà vu ce projet dans l'heure, ne pas incrémenter
+    if (viewCache.has(key) && now - viewCache.get(key) < VIEW_TTL) {
+      const project = await Project.findOne({ slug, type: "mapping" }).select("views").lean();
+      return res.json({ views: project?.views ?? 0 });
+    }
+
+    viewCache.set(key, now);
+
     const project = await Project.findOneAndUpdate(
-      { slug: req.params.slug, type: "mapping" },
+      { slug, type: "mapping" },
       { $inc: { views: 1 } },
       { new: true, select: "slug views" }
     ).lean();

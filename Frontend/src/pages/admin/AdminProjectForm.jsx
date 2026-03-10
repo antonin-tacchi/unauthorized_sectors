@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
+import LoadingButton from "../../components/LoadingButton";
 
 const API_URL        = import.meta.env.VITE_API_URL || "";
 const CLD_CLOUD      = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -66,12 +68,14 @@ function ModelUploadButton({ onUploaded, currentUrl, token, disabled }) {
   async function handleFile(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const fileErr = validateFile(file, "model");
+    if (fileErr) { toast.error(fileErr); e.target.value = ""; return; }
     setProgress(0);
     try {
       const data = await uploadToR2(file, token, setProgress);
       onUploaded(data.url);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setProgress(null);
       e.target.value = "";
@@ -116,12 +120,14 @@ function FileUploadButton({ accept, resourceType, onUploaded, label = "Choose fi
   async function handleFile(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const fileErr = validateFile(file, resourceType);
+    if (fileErr) { toast.error(fileErr); e.target.value = ""; return; }
     setProgress(0);
     try {
       const data = await uploadToCloudinary(file, resourceType, setProgress);
       onUploaded(data.secure_url);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setProgress(null);
       e.target.value = "";
@@ -216,6 +222,37 @@ function TagPicker({ selected, onChange, availableTags }) {
       )}
     </div>
   );
+}
+
+/* ─── Validation ────────────────────────────────────────────────────────── */
+
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+const ALLOWED_IMAGE_EXT = [".jpg", ".jpeg", ".png", ".webp"];
+const ALLOWED_VIDEO_EXT = [".mp4"];
+const ALLOWED_MODEL_EXT = [".glb", ".gltf"];
+
+function getExt(file) {
+  return "." + file.name.split(".").pop().toLowerCase();
+}
+
+function validateFile(file, type) {
+  if (file.size > MAX_FILE_SIZE) return "File exceeds 100 MB limit.";
+  const ext = getExt(file);
+  if (type === "model"  && !ALLOWED_MODEL_EXT.includes(ext)) return `Only ${ALLOWED_MODEL_EXT.join(", ")} allowed.`;
+  if (type === "image"  && !ALLOWED_IMAGE_EXT.includes(ext)) return `Only ${ALLOWED_IMAGE_EXT.join(", ")} allowed.`;
+  if (type === "video"  && !ALLOWED_VIDEO_EXT.includes(ext)) return `Only ${ALLOWED_VIDEO_EXT.join(", ")} allowed.`;
+  return null;
+}
+
+function validateForm(form) {
+  const errs = {};
+  if (!form.title.trim())              errs.title = "Title is required.";
+  else if (form.title.length > 100)    errs.title = "Title must be 100 characters or less.";
+  if (form.shortDesc.length > 300)     errs.shortDesc = "Short description must be 300 characters or less.";
+  if (form.description.length > 2000)  errs.description = "Description must be 2000 characters or less.";
+  const price = form["pricing.cents"];
+  if (price && (!/^\d+$/.test(price) || price.length > 6)) errs.price = "Price must be a number of 6 digits max.";
+  return errs;
 }
 
 /* ─── Form constants ────────────────────────────────────────────────────── */
@@ -351,10 +388,11 @@ export default function AdminProjectForm() {
   const { token }  = useAuth();
   const navigate   = useNavigate();
 
-  const [form, setForm]   = useState(EMPTY);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving]   = useState(false);
-  const [error, setError]     = useState("");
+  const [form, setForm]         = useState(EMPTY);
+  const [loading, setLoading]   = useState(true);
+  const [saving, setSaving]     = useState(false);
+  const [error, setError]       = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [mediaRows, setMediaRows]         = useState([]);
   const [removedMediaIds, setRemovedMediaIds] = useState([]);
@@ -437,6 +475,13 @@ export default function AdminProjectForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    const errs = validateForm(form);
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      toast.error("Please fix the errors below.");
+      return;
+    }
+    setFieldErrors({});
     setSaving(true);
     const payload = {
       title: form.title, shortDesc: form.shortDesc, description: form.description,
@@ -461,8 +506,12 @@ export default function AdminProjectForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Error");
       await syncMedia(data._id);
+      toast.success(isEdit ? "Project updated!" : "Project created!");
       navigate("/admin/projects");
-    } catch (err) { setError(err.message); }
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || "Save failed");
+    }
     finally { setSaving(false); }
   }
 
@@ -479,15 +528,30 @@ export default function AdminProjectForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
 
         <Field label="Title *">
-          <input required value={form.title} onChange={(e) => set("title", e.target.value)} className={inputCls} />
+          <input required maxLength={100} value={form.title} onChange={(e) => set("title", e.target.value)}
+            className={inputCls + (fieldErrors.title ? " border-red-500/60" : "")} />
+          <div className="flex justify-between mt-1">
+            {fieldErrors.title ? <span className="text-xs text-red-400">{fieldErrors.title}</span> : <span />}
+            <span className="text-xs text-white/25">{form.title.length}/100</span>
+          </div>
         </Field>
 
         <Field label="Short description">
-          <input value={form.shortDesc} onChange={(e) => set("shortDesc", e.target.value)} className={inputCls} />
+          <input maxLength={300} value={form.shortDesc} onChange={(e) => set("shortDesc", e.target.value)}
+            className={inputCls + (fieldErrors.shortDesc ? " border-red-500/60" : "")} />
+          <div className="flex justify-between mt-1">
+            {fieldErrors.shortDesc ? <span className="text-xs text-red-400">{fieldErrors.shortDesc}</span> : <span />}
+            <span className="text-xs text-white/25">{form.shortDesc.length}/300</span>
+          </div>
         </Field>
 
         <Field label="Description">
-          <textarea rows={5} value={form.description} onChange={(e) => set("description", e.target.value)} className={inputCls + " resize-y"} />
+          <textarea rows={5} maxLength={2000} value={form.description} onChange={(e) => set("description", e.target.value)}
+            className={inputCls + " resize-y" + (fieldErrors.description ? " border-red-500/60" : "")} />
+          <div className="flex justify-between mt-1">
+            {fieldErrors.description ? <span className="text-xs text-red-400">{fieldErrors.description}</span> : <span />}
+            <span className="text-xs text-white/25">{form.description.length}/2000</span>
+          </div>
         </Field>
 
         {/* Cover image — Cloudinary upload */}
@@ -571,7 +635,9 @@ export default function AdminProjectForm() {
         </Field>
 
         <Field label="Price (cents, 0 = free)">
-          <input type="number" min="0" value={form["pricing.cents"]} onChange={(e) => set("pricing.cents", e.target.value)} className={inputCls} placeholder="0" />
+          <input type="number" min="0" max="999999" value={form["pricing.cents"]} onChange={(e) => set("pricing.cents", e.target.value)}
+            className={inputCls + (fieldErrors.price ? " border-red-500/60" : "")} placeholder="0" />
+          {fieldErrors.price && <p className="mt-1 text-xs text-red-400">{fieldErrors.price}</p>}
         </Field>
 
         {/* ── Overview / Features / Technical tabs ── */}
@@ -659,9 +725,13 @@ export default function AdminProjectForm() {
         )}
 
         <div className="flex gap-3 pt-2">
-          <button type="submit" disabled={saving} className="rounded-lg bg-[#6b5cff] px-5 py-2.5 text-sm font-semibold text-white hover:brightness-110 transition disabled:opacity-50">
-            {saving ? "Saving…" : isEdit ? "Save changes" : "Create project"}
-          </button>
+          <LoadingButton
+            loading={saving}
+            loadingText="Saving…"
+            className="rounded-lg bg-[#6b5cff] px-5 py-2.5 text-sm font-semibold text-white hover:brightness-110"
+          >
+            {isEdit ? "Save changes" : "Create project"}
+          </LoadingButton>
           <button type="button" onClick={() => navigate("/admin/projects")} className="rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm text-white/60 hover:bg-white/10 transition">
             Cancel
           </button>
