@@ -46,7 +46,7 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/90 backdrop-blur">
-        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <NavLink to="/" className="text-sm font-semibold tracking-wide text-white/90 hover:text-white transition">
             Antonin <span className="text-white">TACCHI</span>
           </NavLink>
@@ -57,12 +57,12 @@ export default function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="relative z-[60] inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition"
+            className="relative z-[60] inline-flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition"
           >
-            <div className="w-4 h-3.5 flex flex-col justify-between">
-              <span className={`h-[2px] w-full rounded bg-white/80 transition-all duration-300 origin-center ${open ? "translate-y-[6px] rotate-45" : ""}`} />
-              <span className={`h-[2px] w-full rounded bg-white/80 transition-all duration-200 ${open ? "opacity-0 scale-x-0" : ""}`} />
-              <span className={`h-[2px] w-full rounded bg-white/80 transition-all duration-300 origin-center ${open ? "-translate-y-[6px] -rotate-45" : ""}`} />
+            <div className="w-6 h-5.5 gap-1 flex flex-col justify-between">
+              <span className={`h-[4px] w-full rounded bg-white/80 transition-all duration-300 origin-center ${open ? "translate-y-[8px] rotate-45" : ""}`} />
+              <span className={`h-[4px] w-full rounded bg-white/80 transition-all duration-200 ${open ? "opacity-0 scale-x-0" : ""}`} />
+              <span className={`h-[4px] w-full rounded bg-white/80 transition-all duration-300 origin-center ${open ? "-translate-y-[8px] -rotate-45" : ""}`} />
             </div>
           </button>
           </div>
@@ -96,7 +96,7 @@ export default function Header() {
                 key={to}
                 to={to}
                 end={end}
-                style={{ transitionDelay: open ? `${i * 40}ms` : "0ms" }}
+                style={{ transitionDelay: open ? `${i * 180}ms` : "0ms" }}
                 className={({ isActive }) =>
                   `group flex items-center justify-between rounded-xl px-4 py-3.5 text-lg font-medium transition-all duration-200 ${
                     open ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
@@ -117,7 +117,7 @@ export default function Header() {
                 <div className="my-2 mx-4 border-t border-white/8" />
                 <NavLink
                   to="/admin"
-                  style={{ transitionDelay: open ? `${NAV_LINKS.length * 40}ms` : "0ms" }}
+                  style={{ transitionDelay: open ? `${NAV_LINKS.length * 180}ms` : "0ms" }}
                   className={({ isActive }) =>
                     `group flex items-center justify-between rounded-xl px-4 py-3.5 text-lg font-medium transition-all duration-200 ${
                       open ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
