@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { FaHouse, FaGaugeHigh, FaCode, FaMap, FaCube, FaServer, FaLaptopCode } from "react-icons/fa6";
 import { useReveal, useStagger } from "../hooks/useScrollReveal";
+import ImageHero from "../img/Custom_Project.jpg";
 
 function SectionTitle({ children }) {
   return (
@@ -88,11 +89,8 @@ export default function About() {
             high-population servers.
           </p>
         </div>
-
         {/* Photo placeholder */}
-        <div className="shrink-0 w-full md:w-[260px] h-[200px] md:h-auto rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/20 text-sm">
-          Photo
-        </div>
+          <img src={ImageHero} className="shrink-0 w-full md:w-[260px] h-[200px] md:h-auto rounded-2xl" alt="Antonin TACCHI" />
       </div>
 
       {/* SPECIALTIES */}
