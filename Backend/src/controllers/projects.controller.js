@@ -102,11 +102,6 @@ export async function listProjects(req, res) {
       Project.find(filter).sort(sortObj).skip(skip).limit(limitNum).lean(),
       Project.countDocuments(filter),
     ]);
-
-    // ✅ Ensure every project has its cover image from DB
-    // Priority:
-    // 1) projects.image (legacy/simple UI)
-    // 2) project_media where isCover=true
     const items = Array.isArray(itemsRaw) ? [...itemsRaw] : [];
     const missingIds = items.filter((p) => !p.image).map((p) => p._id);
 
@@ -177,13 +172,11 @@ export async function getProjectBySlug(req, res) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // ✅ Attach media (cover + gallery + videos) from DB
     const media = await ProjectMedia.find({ projectId: project._id })
       .sort({ sortOrder: 1, createdAt: 1 })
       .select({ url: 1, alt: 1, mediaType: 1, provider: 1, isCover: 1, sortOrder: 1, role: 1 })
       .lean();
 
-    // If legacy image missing, pick cover from media
     if (!project.image) {
       const cover = media.find((m) => m.isCover && m.mediaType === "image");
       if (cover?.url) project.image = cover.url;
@@ -204,14 +197,12 @@ export async function incrementView(req, res) {
     const key  = `${ip}:${slug}`;
     const now  = Date.now();
 
-    // Nettoyage des entrées expirées (throttled)
     if (viewCache.size > 5000) {
       for (const [k, ts] of viewCache) {
         if (now - ts > VIEW_TTL) viewCache.delete(k);
       }
     }
 
-    // Si l'IP a déjà vu ce projet dans l'heure, ne pas incrémenter
     if (viewCache.has(key) && now - viewCache.get(key) < VIEW_TTL) {
       const project = await Project.findOne({ slug, type: "mapping" }).select("views").lean();
       return res.json({ views: project?.views ?? 0 });
