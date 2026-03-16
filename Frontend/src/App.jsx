@@ -13,6 +13,7 @@ import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import DiscordCallback from "./pages/DiscordCallback";
 import LegalNotices from "./pages/LegalNotices";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -27,6 +28,7 @@ const AdminFilters    = lazy(() => import("./pages/admin/AdminFilters"));
 const AdminTags       = lazy(() => import("./pages/admin/AdminTags"));
 const AdminSettings   = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminStats      = lazy(() => import("./pages/admin/AdminStats"));
+const AdminTickets    = lazy(() => import("./pages/admin/AdminTickets"));
 
 function AdminFallback() {
   return (
@@ -64,6 +66,7 @@ export default function App() {
           <Route path="projects/:slug" element={<ProjectDetails />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="auth/discord/callback" element={<DiscordCallback />} />
           <Route path="legal-notices" element={<LegalNotices />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="terms-of-service" element={<TermsOfService />} />
@@ -89,6 +92,7 @@ export default function App() {
           <Route path="tags" element={<Suspense fallback={null}><AdminTags /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={null}><AdminSettings /></Suspense>} />
           <Route path="stats"    element={<Suspense fallback={null}><AdminStats /></Suspense>} />
+          <Route path="tickets"  element={<Suspense fallback={null}><AdminTickets /></Suspense>} />
         </Route>
       </Routes>
       </FavoritesProvider>

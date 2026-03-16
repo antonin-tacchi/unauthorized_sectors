@@ -4,13 +4,13 @@ import { useAuth } from "../../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
-function StatCard({ label, value, sub }) {
+function StatCard({ label, value, sub, color }) {
   return (
     <div className="rounded-xl border border-white/8 bg-white/4 p-5">
       <div className="text-xs font-semibold uppercase tracking-widest text-white/35 mb-2">
         {label}
       </div>
-      <div className="text-3xl font-extrabold text-white/90">
+      <div className={`text-3xl font-extrabold ${color ?? "text-white/90"}`}>
         {value ?? <span className="text-white/20">—</span>}
       </div>
       {sub && <div className="mt-1 text-xs text-white/35">{sub}</div>}
@@ -21,16 +21,21 @@ function StatCard({ label, value, sub }) {
 export default function Dashboard() {
   const { token } = useAuth();
   const [stats, setStats] = useState(null);
+  const [openTickets, setOpenTickets] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${API_URL}/api/projects/stats`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error();
-        setStats(await res.json());
+        const [projRes, ticketRes] = await Promise.all([
+          fetch(`${API_URL}/api/projects/stats`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/api/tickets?status=open&limit=1`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        if (projRes.ok) setStats(await projRes.json());
+        if (ticketRes.ok) {
+          const td = await ticketRes.json();
+          setOpenTickets(td.statusCounts?.open ?? 0);
+        }
       } catch {
         setStats(null);
       } finally {
@@ -52,7 +57,7 @@ export default function Dashboard() {
 
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-28 rounded-xl border border-white/8 bg-white/4 animate-pulse" />
           ))}
         </div>
@@ -64,6 +69,18 @@ export default function Dashboard() {
             <StatCard label="Total views" value={totalViews ?? 0} />
             <StatCard label="MLO" value={byType.mlo ?? 0} />
             <StatCard label="Exterior" value={byType.exterior ?? 0} />
+          </div>
+
+          {/* Open tickets */}
+          <div className="mt-4">
+            <Link to="/admin/tickets">
+              <StatCard
+                label="Open tickets"
+                value={openTickets ?? 0}
+                color={openTickets > 0 ? "text-[#a89fff]" : "text-white/90"}
+                sub={openTickets > 0 ? "Click to manage" : "No pending tickets"}
+              />
+            </Link>
           </div>
 
           {/* By type breakdown */}
@@ -103,6 +120,12 @@ export default function Dashboard() {
                 className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70 hover:bg-white/8 transition"
               >
                 Manage projects
+              </Link>
+              <Link
+                to="/admin/tickets"
+                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/70 hover:bg-white/8 transition"
+              >
+                View tickets
               </Link>
             </div>
           </div>

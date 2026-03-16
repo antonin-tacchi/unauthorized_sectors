@@ -60,10 +60,34 @@
       "Bash(node -e \"const fs=require\\(''fs''\\),path=require\\(''path''\\);function walk\\(d\\){for\\(const f of fs.readdirSync\\(d\\)\\){const p=path.join\\(d,f\\);if\\(fs.statSync\\(p\\).isDirectory\\(\\)\\)walk\\(p\\);else if\\(f.endsWith\\(''.js''\\)||f.endsWith\\(''.jsx''\\)\\){let c=fs.readFileSync\\(p,''utf8''\\);const c2=c.replace\\(/import\\\\.meta\\\\.env\\\\.VITE_API_URL \\\\|\\\\| \"\"http:\\\\/\\\\/localhost:\\\\d+\"\"/g,''import.meta.env.VITE_API_URL || \"\"\"\"''\\);if\\(c!==c2\\){fs.writeFileSync\\(p,c2\\);console.log\\(''updated:'',p\\)}}}}walk\\(''.''\\);\")",
       "Bash(node fix-api-url.mjs)",
       "Bash(xargs wc:*)",
-      "Bash(grep -r \"TODO\\\\|FIXME\\\\|BUG\\\\|HACK\\\\|XXX\" /c/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src /c/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Frontend/src --include=*.js --include=*.jsx)"
+      "Bash(grep -r \"TODO\\\\|FIXME\\\\|BUG\\\\|HACK\\\\|XXX\" /c/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src /c/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Frontend/src --include=*.js --include=*.jsx)",
+      "mcp__chrome-devtools__click",
+      "mcp__chrome-devtools__fill",
+      "mcp__chrome-devtools__get_console_message",
+      "Bash(cp \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src/models/Ticket.js\" \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/Backend/src/models/Ticket.js\")",
+      "Bash(cp \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src/controllers/ticket.controller.js\" \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/Backend/src/controllers/ticket.controller.js\")",
+      "Bash(cp \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src/routes/tickets.routes.js\" \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/Backend/src/routes/tickets.routes.js\")",
+      "Bash(cp \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src/services/discord.service.js\" \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/Backend/src/services/discord.service.js\")",
+      "Bash(cp \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/.env\" \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/Backend/.env\")",
+      "Bash(__NEW_LINE_85da9456c08204dc__ diff:*)",
+      "Bash(rsync -av --exclude='.env' --exclude='node_modules' \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/.claude/worktrees/nice-cori/Backend/src/\" \"c:/Users/nenin/Documents/.Perso/unauthorized_sectors/Backend/src/\")",
+      "Bash(wmic process:*)",
+      "Bash(powershell -Command \"\\(Get-Process -Id 28784\\).Path; \\(Get-WmiObject Win32_Process -Filter ''ProcessId=28784''\\).CommandLine\")",
+      "Bash(powershell -Command \":*)",
+      "Bash(timeout 5 node src/server.js)",
+      "Bash(timeout 8 node src/server.js)",
+      "Bash(curl -s -X POST http://localhost:3000/api/tickets -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test@test.com\"\",\"\"subject\"\":\"\"Custom MLO\"\",\"\"priority\"\":\"\"low\"\",\"\"message\"\":\"\"test\"\"}' -w \"\\\\nHTTP_STATUS:%{http_code}\")",
+      "Bash(curl -s http://localhost:3000/api/auth/me -H \"Authorization: Bearer x\")",
+      "Bash(docker ps:*)",
+      "Bash(docker stop:*)",
+      "Bash(curl -s -X POST http://localhost:3000/api/tickets -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test@test.com\"\",\"\"subject\"\":\"\"Custom MLO\"\",\"\"priority\"\":\"\"low\"\",\"\"message\"\":\"\"test ticket\"\"}')",
+      "Bash(docker rm:*)",
+      "Bash(node -e:*)"
     ],
     "additionalDirectories": [
-      "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\.claire\\worktrees\\nice-cori\\Frontend\\src\\components"
+      "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\.claire\\worktrees\\nice-cori\\Frontend\\src\\components",
+      "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\Backend\\src\\routes",
+      "\\"
     ]
   }
 }

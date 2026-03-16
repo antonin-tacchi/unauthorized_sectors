@@ -6,6 +6,9 @@ import apiRoutes from "./routes/index.js";
 
 const app = express();
 
+// Trust proxy (dev tunnels, reverse proxies)
+app.set("trust proxy", 1);
+
 // CORS — whitelist basée sur ALLOWED_ORIGINS en production
 const allowedOrigins =
   process.env.NODE_ENV === "production"
@@ -31,11 +34,13 @@ app.use(cookieParser());
 
 // Cache-Control middleware
 app.use("/api", (req, res, next) => {
-  if (req.method === "GET") {
+  // Routes tickets (admin, données temps-réel) : jamais de cache
+  if (req.path.startsWith("/tickets")) {
+    res.set("Cache-Control", "no-store");
+  } else if (req.method === "GET") {
     // Données publiques : 60s cache, revalidation en arrière-plan
     res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
   } else {
-    // Mutations : jamais de cache
     res.set("Cache-Control", "no-store");
   }
   next();

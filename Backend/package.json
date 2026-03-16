@@ -10,7 +10,8 @@
     "seed": "node script/db/seed.js",
     "seed:fake": "node script/db/seed-projects.fake.js",
     "seed:fake:40": "node script/db/seed-projects.fake.js 40",
-    "create-admin": "node script/db/create-admin.js"
+    "create-admin": "node script/db/create-admin.js",
+    "register-commands": "node script/register-commands.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "discord.js": "^14.25.1",
     "dotenv": "^17.3.1",
     "draco3d": "^1.5.7",
     "express": "^5.2.1",
