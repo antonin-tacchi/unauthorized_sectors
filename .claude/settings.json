@@ -87,7 +87,9 @@
       "Bash(docker compose:*)",
       "Bash(docker exec:*)",
       "Bash(npm run:*)",
-      "mcp__chrome-devtools__select_page"
+      "mcp__chrome-devtools__select_page",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__chrome-devtools__get_network_request"
     ],
     "additionalDirectories": [
       "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\.claire\\worktrees\\nice-cori\\Frontend\\src\\components",
