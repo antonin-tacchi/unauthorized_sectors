@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 
 function Section({ title, children }) {
   return (
@@ -13,6 +14,7 @@ function Section({ title, children }) {
 }
 
 export default function PrivacyPolicy() {
+  const { t } = useTranslation();
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <Helmet>
@@ -21,9 +23,9 @@ export default function PrivacyPolicy() {
       </Helmet>
 
       <div className="mb-10">
-        <Link to="/" className="text-xs text-white/30 hover:text-white/60 transition">← Accueil</Link>
-        <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white/90">Politique de confidentialité</h1>
-        <p className="mt-2 text-sm text-white/40">Dernière mise à jour : 17 mars 2026</p>
+        <Link to="/" className="text-xs text-white/30 hover:text-white/60 transition">{t("legal.backHome")}</Link>
+        <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white/90">{t("legal.privacyTitle")}</h1>
+        <p className="mt-2 text-sm text-white/40">{t("legal.lastUpdated")}</p>
       </div>
 
       <Section title="1. Responsable du traitement">
@@ -117,8 +119,8 @@ export default function PrivacyPolicy() {
       </Section>
 
       <div className="mt-12 pt-6 border-t border-white/10 flex flex-wrap gap-4 text-xs text-white/30">
-        <Link to="/legal-notices" className="hover:text-white/60 transition">Mentions légales</Link>
-        <Link to="/terms-of-service" className="hover:text-white/60 transition">Conditions d'utilisation</Link>
+        <Link to="/legal-notices" className="hover:text-white/60 transition">{t("footer.legal")}</Link>
+        <Link to="/terms-of-service" className="hover:text-white/60 transition">{t("footer.terms")}</Link>
       </div>
     </div>
   );

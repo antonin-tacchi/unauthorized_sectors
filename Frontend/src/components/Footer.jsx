@@ -3,6 +3,7 @@ import { FaDiscord, FaGithub, FaTiktok, FaYoutube } from "react-icons/fa";
 import { HiOutlineMail } from "react-icons/hi";
 import { FiShoppingBag } from "react-icons/fi";
 import { useSettings } from "../context/SettingsContext";
+import { useTranslation } from "react-i18next";
 
 const SOCIAL_LINKS = [
   { key: "discord",     icon: FaDiscord,      label: "Discord",      prefix: "" },
@@ -15,6 +16,7 @@ const SOCIAL_LINKS = [
 
 export default function Footer() {
   const settings = useSettings();
+  const { t } = useTranslation();
 
   const activeLinks = SOCIAL_LINKS.filter(({ key }) => settings[key]);
 
@@ -41,11 +43,11 @@ export default function Footer() {
 
         {/* Legal links */}
         <div className={`flex items-center justify-center gap-3 text-[10px] text-white/40 ${activeLinks.length > 0 ? "mt-3" : ""}`}>
-          <Link to="/terms-of-service" className="hover:text-white transition">Terms of Service</Link>
+          <Link to="/terms-of-service" className="hover:text-white transition">{t("footer.terms")}</Link>
           <span className="text-white/20">|</span>
-          <Link to="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
+          <Link to="/privacy-policy" className="hover:text-white transition">{t("footer.privacy")}</Link>
           <span className="text-white/20">|</span>
-          <Link to="/legal-notices" className="hover:text-white transition">Legal notices</Link>
+          <Link to="/legal-notices" className="hover:text-white transition">{t("footer.legal")}</Link>
         </div>
       </div>
     </footer>

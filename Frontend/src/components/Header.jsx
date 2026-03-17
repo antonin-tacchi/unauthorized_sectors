@@ -1,25 +1,28 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "react-i18next";
+
 const KONAMI = [
   "ArrowUp","ArrowUp","ArrowDown","ArrowDown",
   "ArrowLeft","ArrowRight","ArrowLeft","ArrowRight",
   "b","a",
 ];
 
-const NAV_LINKS = [
-  { to: "/", label: "Home", end: true },
-  { to: "/projects", label: "Projects" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
-];
-
 export default function Header() {
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [konamiVisible, setKonamiVisible] = useState(false);
   const { token } = useAuth();
   const seq = useRef([]);
   const location = useLocation();
+
+  const NAV_LINKS = [
+    { to: "/", label: t("nav.home"), end: true },
+    { to: "/projects", label: t("nav.projects") },
+    { to: "/about", label: t("nav.about") },
+    { to: "/contact", label: t("nav.contact") },
+  ];
 
   useEffect(() => { setOpen(false); }, [location]);
 
@@ -42,6 +45,13 @@ export default function Header() {
   }, []);
 
   const showAdmin = token || konamiVisible;
+
+  function toggleLang() {
+    const next = i18n.language.startsWith("fr") ? "en" : "fr";
+    i18n.changeLanguage(next);
+  }
+
+  const isFR = i18n.language.startsWith("fr");
 
   return (
     <>
@@ -80,7 +90,7 @@ export default function Header() {
 
           {/* Header of panel */}
           <div className="flex items-center justify-between px-6 h-12 border-b border-white/8 shrink-0">
-            <span className="text-xs font-semibold uppercase tracking-widest text-white/30">Menu</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-white/30">{t("nav.menu")}</span>
             <button
               onClick={() => setOpen(false)}
               className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white/40 hover:text-white hover:bg-white/8 transition text-lg leading-none"
@@ -130,7 +140,7 @@ export default function Header() {
                 >
                   <span className="flex items-center gap-2.5">
                     <span className="text-sm">⚙</span>
-                    Admin panel
+                    {t("nav.admin")}
                   </span>
                   <span className="text-[#6b5cff]/30 group-hover:text-[#6b5cff]/60 transition text-sm">→</span>
                 </NavLink>
@@ -139,8 +149,19 @@ export default function Header() {
           </nav>
 
           {/* Footer of panel */}
-          <div className="px-6 py-5 border-t border-white/8 shrink-0">
+          <div className="px-6 py-4 border-t border-white/8 shrink-0 flex items-center justify-between">
             <p className="text-xs text-white/20">Antonin TACCHI · FiveM Mapper</p>
+
+            {/* Language selector */}
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/50 hover:text-white hover:bg-white/10 transition"
+              title={isFR ? "Switch to English" : "Passer en français"}
+            >
+              <span className={isFR ? "text-white/80" : "text-white/30"}>FR</span>
+              <span className="text-white/20">|</span>
+              <span className={isFR ? "text-white/30" : "text-white/80"}>EN</span>
+            </button>
           </div>
         </div>
       </div>

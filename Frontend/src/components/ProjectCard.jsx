@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import SafeImage from "./SafeImage";
 import { useFavorites } from "../context/FavoritesContext";
 
@@ -18,6 +19,7 @@ function HeartIcon({ filled }) {
 }
 
 export default function ProjectCard({ project }) {
+  const { t } = useTranslation();
   const { favorites, toggle } = useFavorites();
   const id = String(project._id);
   const isFav = favorites.has(id);
@@ -64,7 +66,7 @@ export default function ProjectCard({ project }) {
           {/* top-left badge */}
           {isNew && (
             <span className="absolute left-3 top-3 rounded-md bg-[#5d5bd6] px-3 py-1 text-xs font-semibold">
-              New
+              {t("projects.new")}
             </span>
           )}
 
@@ -81,7 +83,7 @@ export default function ProjectCard({ project }) {
           {/* bottom-right badge */}
           {isPopular && (
             <span className="absolute bottom-3 right-3 rounded-md bg-[#5d5bd6] px-3 py-1 text-xs font-semibold">
-              Popular
+              {t("projects.popular")}
             </span>
           )}
         </Link>
@@ -104,12 +106,12 @@ export default function ProjectCard({ project }) {
 
           {/* Tags pills */}
           <div className="mt-3 flex flex-wrap gap-2">
-            {tags.map((t) => (
+            {tags.map((tag) => (
               <span
-                key={t}
+                key={tag}
                 className="rounded-full bg-[#5d5bd6]/90 px-3 py-0.5 text-xs font-semibold text-white"
               >
-                {t}
+                {tag}
               </span>
             ))}
           </div>
@@ -129,7 +131,7 @@ export default function ProjectCard({ project }) {
                        transition duration-200 hover:brightness-110 hover:-translate-y-0.5
                        hover:shadow-[0_8px_24px_-8px_rgba(107,92,255,0.7)] md:mt-auto shrink-0"
           >
-            Details
+            {t("projects.details")}
           </Link>
         </div>
       </div>

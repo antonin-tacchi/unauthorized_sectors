@@ -1,0 +1,173 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "projects": "Projets",
+    "about": "À propos",
+    "contact": "Contact",
+    "admin": "Panneau admin",
+    "menu": "Menu"
+  },
+  "footer": {
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "legal": "Mentions légales"
+  },
+  "home": {
+    "featured": "À la une",
+    "viewProject": "Voir le projet",
+    "mloTitle": "Projet MLO",
+    "mloSubtitle": "Mapping intérieur (shop, QG, banque…)",
+    "cityTitle": "Cartes de ville",
+    "citySubtitle": "Modifications extérieures (zone, emplois…)",
+    "customTitle": "Commande sur mesure",
+    "customSubtitle": "Services de mapping personnalisé",
+    "devTitle": "Dev + Mapping",
+    "devSubtitle": "Scripts, features de map & plus.",
+    "projectCount": "{{count}} Projet",
+    "services": "Services personnalisés",
+    "service1Title": "Création MLO sur mesure",
+    "service1Text": "Création d'intérieurs sur mesure adaptés aux besoins de votre serveur RP. Placement optimisé des props, configuration propre des collisions et performances stables pour les environnements multijoueurs.",
+    "service2Title": "Mapping extérieur",
+    "service2Text": "Environnements extérieurs personnalisés et refonte complète de zones. Redesign de zones, détails immersifs et streaming optimisé pour les serveurs à forte population.",
+    "service3Title": "Optimisation",
+    "service3Text": "Analyse et amélioration des performances des maps existantes. Nettoyage des props, ajustements LOD et optimisation du streaming pour un gameplay fluide.",
+    "cta": "Demander un projet custom",
+    "whatsNew": "Nouveautés"
+  },
+  "about": {
+    "title": "À propos",
+    "subtitle": "Mapper & Développeur professionnel pour GTA V / FiveM",
+    "role": "Mapper / Développeur",
+    "bio1": "Je suis développeur web et mapper FiveM, spécialisé dans la création d'environnements immersifs et optimisés pour les serveurs roleplay. Avec une solide expertise technique, j'aborde le mapping non seulement comme du design visuel, mais comme un équilibre entre esthétique, performance et stabilité serveur.",
+    "bio2": "Je combine la logique de développement avec le mapping créatif pour livrer des projets propres, optimisés et évolutifs, adaptés à l'identité de chaque serveur. Mon objectif est simple : créer des environnements beaux, immersifs, qui tournent parfaitement même sur des serveurs à forte population.",
+    "specialtiesTitle": "Mes spécialités",
+    "specialty1Title": "Création MLO sur mesure",
+    "specialty1Desc": "Création d'intérieurs optimisés et designés.",
+    "specialty2Title": "Performance optimisée",
+    "specialty2Desc": "Garantir un gameplay fluide avec un FPS élevé",
+    "specialty3Title": "Mapping + Scripting",
+    "specialty3Desc": "Intégration des maps avec des scripts personnalisés",
+    "toolsTitle": "Outils utilisés",
+    "tool1Desc": "Logiciel puissant d'édition de maps GTA V",
+    "tool2Desc": "Modélisation 3D pour intérieurs et props détaillés",
+    "tool3Desc": "Expertise en optimisation de serveur FiveM",
+    "tool4Desc": "Environnement de code et scripting",
+    "workflowTitle": "Processus de travail",
+    "step1Title": "Discussion",
+    "step1Desc": "Consultation initiale pour comprendre vos besoins & votre vision.",
+    "step2Title": "Prototype",
+    "step2Desc": "Création d'une première version de la map pour votre validation.",
+    "step3Title": "Livraison",
+    "step3Desc": "Finalisation et livraison du projet de mapping terminé.",
+    "step4Title": "Support",
+    "step4Desc": "Assistance continue et support après la livraison."
+  },
+  "contact": {
+    "title": "Me contacter",
+    "subtitle": "Commission, question, réclamation ou bug — je réponds en général sous 24h.",
+    "emailLabel": "Email",
+    "discordLabel": "Discord",
+    "optional": "(Optionnel)",
+    "subjectLabel": "Sujet",
+    "subjectPlaceholder": "Sélectionner un sujet…",
+    "budgetLabel": "Budget estimé",
+    "timelineLabel": "Délai souhaité",
+    "notSpecified": "Non précisé",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Décris ta demande, ton projet ou ton problème…",
+    "legalNote": "En me contactant, tu acceptes les",
+    "legalAnd": "et la",
+    "submit": "Envoyer",
+    "submitting": "Envoi en cours…",
+    "successTitle": "Message envoyé !",
+    "successText": "Ta demande a bien été reçue. Je te répondrai dans les plus brefs délais par email.",
+    "discordJoinText": "Rejoins le serveur Discord pour suivre ton ticket et communiquer directement.",
+    "discordConnect": "Rejoindre le Discord",
+    "sendAnother": "Envoyer un autre message",
+    "subjects": {
+      "commissionGroup": "— Commission —",
+      "customMlo": "Custom MLO",
+      "exteriorMapping": "Exterior Mapping",
+      "optimization": "Optimization",
+      "supportGroup": "— Support & Autre —",
+      "bugReport": "Bug Report",
+      "complaint": "Réclamation",
+      "generalQuestion": "Question générale",
+      "other": "Autre"
+    },
+    "budgets": {
+      "under20": "< 20 €",
+      "20to50": "20 – 50 €",
+      "50to100": "50 – 100 €",
+      "100to200": "100 – 200 €",
+      "over200": "> 200 €",
+      "discuss": "À discuter"
+    },
+    "timelines": {
+      "under1week": "Moins d'une semaine",
+      "1to2weeks": "1 – 2 semaines",
+      "2to4weeks": "2 – 4 semaines",
+      "over1month": "Plus d'un mois",
+      "flexible": "Flexible / pas de deadline"
+    },
+    "errors": {
+      "emailRequired": "Email valide requis.",
+      "subjectRequired": "Veuillez sélectionner un sujet.",
+      "messageRequired": "Le message est requis."
+    }
+  },
+  "projects": {
+    "title": "Projets",
+    "searchPlaceholder": "Rechercher…",
+    "typeLabel": "Type",
+    "styleLabel": "Style",
+    "sizeLabel": "Taille",
+    "performanceLabel": "Performance",
+    "sortNewest": "Plus récent",
+    "sortOldest": "Plus ancien",
+    "sortTitle": "Titre",
+    "projectCount_one": "{{count}} projet",
+    "projectCount_other": "{{count}} projets",
+    "noResults": "Aucun projet trouvé",
+    "noResultsQuery": "Aucun résultat pour «\u00a0{{query}}\u00a0»",
+    "clearFilters": "Effacer les filtres",
+    "prev": "Préc.",
+    "next": "Suiv.",
+    "page": "Page",
+    "details": "Détails",
+    "new": "Nouveau",
+    "popular": "Populaire",
+    "mappingTypes": {
+      "mlo": "MLO",
+      "interior": "Intérieur",
+      "exterior": "Extérieur",
+      "ymap": "YMAP",
+      "ytyp": "YTYP",
+      "customProps": "Props custom",
+      "addonMap": "Map add-on",
+      "rework": "Rework"
+    },
+    "styles": {
+      "modern": "Moderne",
+      "classic": "Classique",
+      "cyber": "Cyber"
+    },
+    "sizes": {
+      "small": "Petit",
+      "medium": "Moyen",
+      "massive": "Massif"
+    },
+    "performances": {
+      "optimized": "Optimisé",
+      "balanced": "Équilibré",
+      "heavy": "Lourd"
+    }
+  },
+  "legal": {
+    "termsTitle": "Conditions d'utilisation",
+    "privacyTitle": "Politique de confidentialité",
+    "legalTitle": "Mentions légales",
+    "lastUpdated": "Dernière mise à jour : 17 mars 2026",
+    "backHome": "← Accueil"
+  }
+}

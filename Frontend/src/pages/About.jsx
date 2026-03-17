@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { FaHouse, FaGaugeHigh, FaCode, FaMap, FaCube, FaServer, FaLaptopCode } from "react-icons/fa6";
 import { useReveal, useStagger } from "../hooks/useScrollReveal";
 import ImageHero from "../img/Custom_Project.jpg";
@@ -51,6 +52,7 @@ function WorkflowStep({ number, title, desc, isLast }) {
 }
 
 export default function About() {
+  const { t } = useTranslation();
   const heroRef        = useReveal({ noScroll: true, delay: 0.1 });
   const bioRef         = useReveal();
   const specialtiesRef = useStagger(":scope > *", { stagger: 0.15 });
@@ -63,12 +65,10 @@ export default function About() {
         <title>About — Antonin TACCHI</title>
         <meta name="description" content="Learn more about Antonin TACCHI, professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
         <link rel="canonical" href="https://antonin-tacchi.com/about" />
-        {/* Open Graph */}
         <meta property="og:title" content="About — Antonin TACCHI" />
         <meta property="og:description" content="Professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
         <meta property="og:url" content="https://antonin-tacchi.com/about" />
         <meta property="og:type" content="profile" />
-        {/* Twitter */}
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="About — Antonin TACCHI" />
         <meta name="twitter:description" content="Professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
@@ -76,110 +76,52 @@ export default function About() {
 
       {/* HERO */}
       <div ref={heroRef} className="mb-2">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white/90">About Me</h1>
-        <p className="mt-2 text-white/50">Professional mapper &amp; Developer for GTA V / FiveM</p>
+        <h1 className="text-5xl font-extrabold tracking-tight text-white/90">{t("about.title")}</h1>
+        <p className="mt-2 text-white/50">{t("about.subtitle")}</p>
       </div>
 
       {/* BIO CARD */}
       <div ref={bioRef} className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 flex flex-col md:flex-row gap-8">
-        {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="mb-1 text-xl font-extrabold text-white/90">Antonin TACCHI</div>
-          <div className="text-[#6b5cff] text-sm font-semibold mb-5">Mapper / Developer</div>
-          <p className="text-white/60 text-sm leading-7">
-            I'm a web developer and FiveM mapper focused on creating immersive,
-            performance-optimized environments for roleplay servers. With a strong technical
-            background, I approach mapping not only as visual design, but as a balance between
-            aesthetics, performance, and server stability.
-          </p>
-          <p className="text-white/60 text-sm leading-7 mt-4">
-            I combine development logic with creative mapping to deliver clean, optimized, and
-            scalable projects tailored to each server's identity. My goal is simple: build
-            environments that look great, feel immersive, and run smoothly even on
-            high-population servers.
-          </p>
+          <div className="text-[#6b5cff] text-sm font-semibold mb-5">{t("about.role")}</div>
+          <p className="text-white/60 text-sm leading-7">{t("about.bio1")}</p>
+          <p className="text-white/60 text-sm leading-7 mt-4">{t("about.bio2")}</p>
         </div>
-        {/* Photo placeholder */}
-          <img src={ImageHero} className="shrink-0 w-full md:w-[260px] h-[200px] md:h-auto rounded-2xl" alt="Antonin TACCHI" />
+        <img src={ImageHero} className="shrink-0 w-full md:w-[260px] h-[200px] md:h-auto rounded-2xl" alt="Antonin TACCHI" />
       </div>
 
       {/* SPECIALTIES */}
       <section className="mt-12">
-        <SectionTitle>My specialties</SectionTitle>
+        <SectionTitle>{t("about.specialtiesTitle")}</SectionTitle>
         <div ref={specialtiesRef} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <SpecialtyCard
-            icon={<FaHouse />}
-            title="Custom MLO Design"
-            desc="Creating design, optimized interiors."
-          />
-          <SpecialtyCard
-            icon={<FaGaugeHigh />}
-            title="Optimized Performance"
-            desc="Ensuring smooth gameplay with high FPS"
-          />
-          <SpecialtyCard
-            icon={<FaCode />}
-            title="Mapping + Scripting"
-            desc="Integrating maps with custom scripts"
-          />
+          <SpecialtyCard icon={<FaHouse />} title={t("about.specialty1Title")} desc={t("about.specialty1Desc")} />
+          <SpecialtyCard icon={<FaGaugeHigh />} title={t("about.specialty2Title")} desc={t("about.specialty2Desc")} />
+          <SpecialtyCard icon={<FaCode />} title={t("about.specialty3Title")} desc={t("about.specialty3Desc")} />
         </div>
       </section>
 
       {/* TOOLS */}
       <section className="mt-12">
-        <SectionTitle>Tools I use</SectionTitle>
+        <SectionTitle>{t("about.toolsTitle")}</SectionTitle>
         <div ref={toolsRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <ToolCard
-            icon={<FaMap />}
-            title="CodeWalker"
-            desc="Powerful GTA V map editing software"
-          />
-          <ToolCard
-            icon={<FaCube />}
-            title="Blender"
-            desc="3D modeling for detailed interiors and props"
-          />
-          <ToolCard
-            icon={<FaServer />}
-            title="FiveM"
-            desc="Expertise in FiveM server optimization"
-          />
-          <ToolCard
-            icon={<FaLaptopCode />}
-            title="Visual Studio Code"
-            desc="Coding and scripting environment"
-          />
+          <ToolCard icon={<FaMap />} title="CodeWalker" desc={t("about.tool1Desc")} />
+          <ToolCard icon={<FaCube />} title="Blender" desc={t("about.tool2Desc")} />
+          <ToolCard icon={<FaServer />} title="FiveM" desc={t("about.tool3Desc")} />
+          <ToolCard icon={<FaLaptopCode />} title="Visual Studio Code" desc={t("about.tool4Desc")} />
         </div>
       </section>
 
       {/* WORKFLOW */}
       <section className="mt-12">
-        <SectionTitle>Workflow</SectionTitle>
+        <SectionTitle>{t("about.workflowTitle")}</SectionTitle>
         <div ref={workflowRef} className="flex flex-col md:flex-row gap-2 md:gap-0 md:items-start">
-          <WorkflowStep
-            number="01"
-            title="Discussion"
-            desc="Initial consultation to understand your needs & vision."
-          />
-          <WorkflowStep
-            number="02"
-            title="Prototype"
-            desc="Creating a first version of the map for your review."
-          />
-          <WorkflowStep
-            number="03"
-            title="Delivery"
-            desc="Finalizing and delivering the finished mapping project."
-          />
-          <WorkflowStep
-            number="04"
-            title="Support"
-            desc="Providing ongoing support and assistance post-delivery."
-            isLast
-          />
+          <WorkflowStep number="01" title={t("about.step1Title")} desc={t("about.step1Desc")} />
+          <WorkflowStep number="02" title={t("about.step2Title")} desc={t("about.step2Desc")} />
+          <WorkflowStep number="03" title={t("about.step3Title")} desc={t("about.step3Desc")} />
+          <WorkflowStep number="04" title={t("about.step4Title")} desc={t("about.step4Desc")} isLast />
         </div>
       </section>
-
     </div>
   );
 }

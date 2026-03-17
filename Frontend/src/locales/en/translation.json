@@ -1,0 +1,173 @@
+{
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact",
+    "admin": "Admin panel",
+    "menu": "Menu"
+  },
+  "footer": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "legal": "Legal notices"
+  },
+  "home": {
+    "featured": "Featured",
+    "viewProject": "View Project",
+    "mloTitle": "MLO project",
+    "mloSubtitle": "Interior mapping (shop, HQ, bank …)",
+    "cityTitle": "City Maps",
+    "citySubtitle": "Exterior map edits (area, jobs …)",
+    "customTitle": "Custom Order",
+    "customSubtitle": "Custom mapping services",
+    "devTitle": "Dev + Mapping",
+    "devSubtitle": "Scripts, map features & more.",
+    "projectCount": "{{count}} Project",
+    "services": "Custom services",
+    "service1Title": "Custom MLO Creation",
+    "service1Text": "Custom interior creation tailored to your RP server needs. Optimized prop placement, clean collision setup, and stable performance for multiplayer environments.",
+    "service2Title": "Exterior Mapping",
+    "service2Text": "Custom exterior environments and full area reworks. Zone redesign, immersive detailing, and optimized streaming for high-population servers.",
+    "service3Title": "Optimisation",
+    "service3Text": "Performance analysis and improvement of existing maps. Prop cleanup, LOD adjustments, and streaming optimization to ensure smooth gameplay.",
+    "cta": "Request Custom Project",
+    "whatsNew": "What's New"
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Professional mapper & Developer for GTA V / FiveM",
+    "role": "Mapper / Developer",
+    "bio1": "I'm a web developer and FiveM mapper focused on creating immersive, performance-optimized environments for roleplay servers. With a strong technical background, I approach mapping not only as visual design, but as a balance between aesthetics, performance, and server stability.",
+    "bio2": "I combine development logic with creative mapping to deliver clean, optimized, and scalable projects tailored to each server's identity. My goal is simple: build environments that look great, feel immersive, and run smoothly even on high-population servers.",
+    "specialtiesTitle": "My specialties",
+    "specialty1Title": "Custom MLO Design",
+    "specialty1Desc": "Creating design, optimized interiors.",
+    "specialty2Title": "Optimized Performance",
+    "specialty2Desc": "Ensuring smooth gameplay with high FPS",
+    "specialty3Title": "Mapping + Scripting",
+    "specialty3Desc": "Integrating maps with custom scripts",
+    "toolsTitle": "Tools I use",
+    "tool1Desc": "Powerful GTA V map editing software",
+    "tool2Desc": "3D modeling for detailed interiors and props",
+    "tool3Desc": "Expertise in FiveM server optimization",
+    "tool4Desc": "Coding and scripting environment",
+    "workflowTitle": "Workflow",
+    "step1Title": "Discussion",
+    "step1Desc": "Initial consultation to understand your needs & vision.",
+    "step2Title": "Prototype",
+    "step2Desc": "Creating a first version of the map for your review.",
+    "step3Title": "Delivery",
+    "step3Desc": "Finalizing and delivering the finished mapping project.",
+    "step4Title": "Support",
+    "step4Desc": "Providing ongoing support and assistance post-delivery."
+  },
+  "contact": {
+    "title": "Contact Me",
+    "subtitle": "Commission, question, complaint or bug — I usually respond within 24h.",
+    "emailLabel": "Email",
+    "discordLabel": "Discord",
+    "optional": "(Optional)",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Select a subject…",
+    "budgetLabel": "Estimated budget",
+    "timelineLabel": "Desired timeline",
+    "notSpecified": "Not specified",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Describe your request, project or issue…",
+    "legalNote": "By contacting me, you agree to the",
+    "legalAnd": "and",
+    "submit": "Send",
+    "submitting": "Sending…",
+    "successTitle": "Message sent!",
+    "successText": "Your request has been received. I will reply as soon as possible by email.",
+    "discordJoinText": "Join the Discord server to track your ticket and communicate directly.",
+    "discordConnect": "Connect with Discord & join the server",
+    "sendAnother": "Send another message",
+    "subjects": {
+      "commissionGroup": "— Commission —",
+      "customMlo": "Custom MLO",
+      "exteriorMapping": "Exterior Mapping",
+      "optimization": "Optimization",
+      "supportGroup": "— Support & Other —",
+      "bugReport": "Bug Report",
+      "complaint": "Complaint",
+      "generalQuestion": "General question",
+      "other": "Other"
+    },
+    "budgets": {
+      "under20": "< 20 €",
+      "20to50": "20 – 50 €",
+      "50to100": "50 – 100 €",
+      "100to200": "100 – 200 €",
+      "over200": "> 200 €",
+      "discuss": "To discuss"
+    },
+    "timelines": {
+      "under1week": "Less than a week",
+      "1to2weeks": "1 – 2 weeks",
+      "2to4weeks": "2 – 4 weeks",
+      "over1month": "More than a month",
+      "flexible": "Flexible / no deadline"
+    },
+    "errors": {
+      "emailRequired": "Valid email required.",
+      "subjectRequired": "Please select a subject.",
+      "messageRequired": "Message is required."
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "searchPlaceholder": "Search…",
+    "typeLabel": "Type",
+    "styleLabel": "Style",
+    "sizeLabel": "Size",
+    "performanceLabel": "Performance",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "sortTitle": "Title",
+    "projectCount_one": "{{count}} project",
+    "projectCount_other": "{{count}} projects",
+    "noResults": "No projects found",
+    "noResultsQuery": "No results for \"{{query}}\"",
+    "clearFilters": "Clear filters",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page",
+    "details": "Details",
+    "new": "New",
+    "popular": "Popular",
+    "mappingTypes": {
+      "mlo": "MLO",
+      "interior": "Interior",
+      "exterior": "Exterior",
+      "ymap": "YMAP",
+      "ytyp": "YTYP",
+      "customProps": "Custom Props",
+      "addonMap": "Add-on Map",
+      "rework": "Rework"
+    },
+    "styles": {
+      "modern": "Modern",
+      "classic": "Classic",
+      "cyber": "Cyber"
+    },
+    "sizes": {
+      "small": "Small",
+      "medium": "Medium",
+      "massive": "Massive"
+    },
+    "performances": {
+      "optimized": "Optimized",
+      "balanced": "Balanced",
+      "heavy": "Heavy"
+    }
+  },
+  "legal": {
+    "termsTitle": "Terms of Service",
+    "privacyTitle": "Privacy Policy",
+    "legalTitle": "Legal Notices",
+    "lastUpdated": "Last updated: March 17, 2026",
+    "backHome": "← Home"
+  }
+}
