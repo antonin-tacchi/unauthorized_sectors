@@ -41,11 +41,11 @@ export default function Footer() {
 
         {/* Legal links */}
         <div className={`flex items-center justify-center gap-3 text-[10px] text-white/40 ${activeLinks.length > 0 ? "mt-3" : ""}`}>
-          <Link to="/terms" className="hover:text-white transition">Terms of Services</Link>
+          <Link to="/terms-of-service" className="hover:text-white transition">Terms of Service</Link>
           <span className="text-white/20">|</span>
-          <Link to="/privacy" className="hover:text-white transition">Privacy Policy</Link>
+          <Link to="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
           <span className="text-white/20">|</span>
-          <Link to="/legal" className="hover:text-white transition">Legal notices</Link>
+          <Link to="/legal-notices" className="hover:text-white transition">Legal notices</Link>
         </div>
       </div>
     </footer>

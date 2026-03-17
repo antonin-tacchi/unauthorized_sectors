@@ -88,28 +88,26 @@ export default function ProjectCard({ project }) {
 
         {/* Middle content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3">
-            <h3 className="text-2xl font-semibold leading-tight truncate">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h3 className="text-xl md:text-2xl font-semibold leading-tight">
               {project.title}
             </h3>
-
-            <span className="text-white/70">|</span>
-            <span className="text-white/70 text-lg">
+            <span className="text-white/50 text-base">
               {project?.pricing?.cents ? `${(project.pricing.cents / 100).toFixed(0)} $` : "—"}
             </span>
           </div>
 
-          <p className="mt-2 text-sm text-white/65 leading-relaxed line-clamp-4">
+          <p className="mt-2 text-sm text-white/65 leading-relaxed line-clamp-3 md:line-clamp-4">
             {project.description ||
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Nullam quis imperdiet augue."}
           </p>
 
           {/* Tags pills */}
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((t) => (
               <span
                 key={t}
-                className="rounded-full bg-[#5d5bd6]/90 px-4 py-1 text-xs font-semibold text-white"
+                className="rounded-full bg-[#5d5bd6]/90 px-3 py-0.5 text-xs font-semibold text-white"
               >
                 {t}
               </span>
@@ -118,18 +116,18 @@ export default function ProjectCard({ project }) {
         </div>
 
         {/* Right meta */}
-        <div className="md:w-[190px] shrink-0 md:border-l border-t md:border-t-0 border-white/10 pt-3 md:pt-0 md:pl-4 flex md:flex-col flex-row items-center md:items-stretch justify-between">
-          <div className="text-sm text-white/75 md:space-y-2 flex md:flex-col flex-row gap-4 md:gap-0">
-            <div className="text-white/80 capitalize">{project.mappingType || "—"}</div>
-            <div className="text-white/90 text-base font-semibold capitalize">{project.size || "—"}</div>
-            <div className="text-white/70 capitalize">{project.performance || "—"}</div>
+        <div className="md:w-[190px] shrink-0 md:border-l border-t md:border-t-0 border-white/10 pt-3 md:pt-0 md:pl-4 flex md:flex-col flex-row items-center md:items-stretch justify-between gap-3">
+          <div className="flex md:flex-col flex-row flex-wrap gap-x-4 gap-y-1 text-sm text-white/70">
+            <span className="capitalize">{project.mappingType || "—"}</span>
+            <span className="font-semibold text-white/90 capitalize">{project.size || "—"}</span>
+            <span className="capitalize">{project.performance || "—"}</span>
           </div>
 
           <Link
             to={`/projects/${project.slug}`}
-            className="inline-flex items-center justify-center rounded-xl bg-[#5d5bd6] px-6 py-3 font-semibold
+            className="inline-flex items-center justify-center rounded-xl bg-[#5d5bd6] px-5 py-2.5 text-sm font-semibold
                        transition duration-200 hover:brightness-110 hover:-translate-y-0.5
-                       hover:shadow-[0_8px_24px_-8px_rgba(107,92,255,0.7)] md:mt-4"
+                       hover:shadow-[0_8px_24px_-8px_rgba(107,92,255,0.7)] md:mt-auto shrink-0"
           >
             Details
           </Link>

@@ -209,38 +209,37 @@ export default function Projects() {
         <meta name="twitter:description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
       </Helmet>
       <div className="px-6 pt-7 pb-6">
-        <div className="mt-5 rounded-xl border border-white/10 bg-[#101828]/60 px-4 py-3">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="mt-5 rounded-xl border border-white/10 bg-[#101828]/60 px-4 py-3 space-y-3">
+          {/* Row 1 : search + sort (full width on mobile) */}
+          <div className="flex items-center gap-3">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search…"
+              className="flex-1 min-w-0 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm outline-none focus:border-white/25"
+            />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm outline-none focus:border-white/25"
+            >
+              {SORTS.map((s) => (
+                <option key={s.value} value={s.value} className="text-black">
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Row 2 : filters + count */}
+          <div className="flex flex-wrap items-center gap-2">
             <Select value={mappingType} onChange={setMappingType} options={MAPPING_TYPES} />
             <Select value={style} onChange={setStyle} options={STYLES} />
             <Select value={size} onChange={setSize} options={SIZES} />
             <Select value={performance} onChange={setPerformance} options={PERF} />
-
-            <div className="ml-auto flex items-center gap-3">
-              <div className="hidden md:block text-sm text-white/60">
-                Projects found : <span className="text-white">{total}</span>
-                <span className="text-white/40"> (showing {items.length})</span>
-              </div>
-
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search…"
-                className="w-[220px] rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm outline-none focus:border-white/25"
-              />
-
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm outline-none focus:border-white/25"
-              >
-                {SORTS.map((s) => (
-                  <option key={s.value} value={s.value} className="text-black">
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <span className="ml-auto text-xs text-white/40">
+              <span className="text-white/70">{total}</span> project{total !== 1 ? "s" : ""}
+            </span>
           </div>
         </div>
 
