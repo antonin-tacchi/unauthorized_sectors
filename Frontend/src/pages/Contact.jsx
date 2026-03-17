@@ -180,11 +180,11 @@ export default function Contact() {
       <Helmet>
         <title>Contact — Antonin TACCHI</title>
         <meta name="description" content="Get in touch with Antonin TACCHI for custom FiveM mapping commissions, quotes, or any question. Respond within 24 hours." />
-        <link rel="canonical" href="https://antonin-tacchi.fr/contact" />
+        <link rel="canonical" href="https://antonin-tacchi.com/contact" />
         {/* Open Graph */}
         <meta property="og:title" content="Contact — Antonin TACCHI" />
         <meta property="og:description" content="Get in touch for custom FiveM mapping commissions, quotes, or any question. Respond within 24 hours." />
-        <meta property="og:url" content="https://antonin-tacchi.fr/contact" />
+        <meta property="og:url" content="https://antonin-tacchi.com/contact" />
         <meta property="og:type" content="website" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary" />

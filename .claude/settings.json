@@ -85,7 +85,8 @@
       "Bash(node -e:*)",
       "mcp__chrome-devtools__fill_form",
       "Bash(docker compose:*)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(npm run:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\.claire\\worktrees\\nice-cori\\Frontend\\src\\components",

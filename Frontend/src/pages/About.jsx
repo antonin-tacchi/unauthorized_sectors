@@ -62,11 +62,11 @@ export default function About() {
       <Helmet>
         <title>About — Antonin TACCHI</title>
         <meta name="description" content="Learn more about Antonin TACCHI, professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
-        <link rel="canonical" href="https://antonin-tacchi.fr/about" />
+        <link rel="canonical" href="https://antonin-tacchi.com/about" />
         {/* Open Graph */}
         <meta property="og:title" content="About — Antonin TACCHI" />
         <meta property="og:description" content="Professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
-        <meta property="og:url" content="https://antonin-tacchi.fr/about" />
+        <meta property="og:url" content="https://antonin-tacchi.com/about" />
         <meta property="og:type" content="profile" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary" />

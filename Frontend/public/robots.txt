@@ -4,4 +4,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://antonin-tacchi.fr/sitemap.xml
+Sitemap: https://antonin-tacchi.com/sitemap.xml
