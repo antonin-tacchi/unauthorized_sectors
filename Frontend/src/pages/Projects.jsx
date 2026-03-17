@@ -197,6 +197,16 @@ export default function Projects() {
       <Helmet>
         <title>Projects — Antonin TACCHI</title>
         <meta name="description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
+        <link rel="canonical" href="https://antonin-tacchi.fr/projects" />
+        {/* Open Graph */}
+        <meta property="og:title" content="Projects — Antonin TACCHI" />
+        <meta property="og:description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
+        <meta property="og:url" content="https://antonin-tacchi.fr/projects" />
+        <meta property="og:type" content="website" />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Projects — Antonin TACCHI" />
+        <meta name="twitter:description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
       </Helmet>
       <div className="px-6 pt-7 pb-6">
         <div className="mt-5 rounded-xl border border-white/10 bg-[#101828]/60 px-4 py-3">

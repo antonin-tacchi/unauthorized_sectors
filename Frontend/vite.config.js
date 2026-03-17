@@ -14,4 +14,23 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Three.js is very large (~1MB) — isolate it
+          "vendor-three": ["three", "@react-three/fiber", "@react-three/drei"],
+          // React core
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          // Animation libs
+          "vendor-motion": ["framer-motion", "gsap"],
+          // UI libs
+          "vendor-ui": ["react-hot-toast", "react-icons", "react-compare-slider"],
+          // Charts (admin only)
+          "vendor-charts": ["recharts"],
+        },
+      },
+    },
+  },
 })

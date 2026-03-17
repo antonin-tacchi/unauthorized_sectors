@@ -184,6 +184,16 @@ export default function Home() {
       <Helmet>
         <title>Antonin TACCHI — FiveM Mapping Portfolio</title>
         <meta name="description" content="Portfolio of Antonin TACCHI, professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
+        <link rel="canonical" href="https://antonin-tacchi.fr/" />
+        {/* Open Graph */}
+        <meta property="og:title" content="Antonin TACCHI — FiveM Mapping Portfolio" />
+        <meta property="og:description" content="Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
+        <meta property="og:url" content="https://antonin-tacchi.fr/" />
+        <meta property="og:type" content="website" />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Antonin TACCHI — FiveM Mapping Portfolio" />
+        <meta name="twitter:description" content="Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
       </Helmet>
       {/* HERO / FEATURED */}
       <section ref={heroRef} className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_40px_140px_-90px_rgba(0,0,0,0.95)]">
