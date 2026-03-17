@@ -1,10 +1,17 @@
 import Project from "../models/Project.js";
+import SiteVisit from "../models/SiteVisit.js";
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export async function getAdminStats(req, res) {
   try {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().slice(0, 10);
+    const today = todayStr();
 
     const [
       totalViews,
@@ -12,8 +19,11 @@ export async function getAdminStats(req, res) {
       addedThisMonth,
       totalProjects,
       totalFavorites,
+      totalVisitorsAgg,
+      todayVisit,
+      dailyVisitsRaw,
     ] = await Promise.all([
-      // Somme de toutes les vues
+      // Somme de toutes les vues projets
       Project.aggregate([
         { $match: { type: "mapping" } },
         { $group: { _id: null, total: { $sum: "$views" } } },
@@ -40,6 +50,20 @@ export async function getAdminStats(req, res) {
         { $match: { type: "mapping" } },
         { $group: { _id: null, total: { $sum: "$stats.favorites" } } },
       ]),
+
+      // Total visiteurs uniques tous temps
+      SiteVisit.aggregate([
+        { $group: { _id: null, total: { $sum: "$uniqueVisitors" } } },
+      ]),
+
+      // Visiteurs aujourd'hui
+      SiteVisit.findOne({ date: today }).lean(),
+
+      // Visites par jour sur 30 derniers jours
+      SiteVisit.find({ date: { $gte: thirtyDaysAgoStr } })
+        .sort({ date: 1 })
+        .select("date visits uniqueVisitors")
+        .lean(),
     ]);
 
     // Vues par jour sur les 30 derniers jours (basé sur publishedAt comme proxy)
@@ -60,6 +84,9 @@ export async function getAdminStats(req, res) {
       totalProjects,
       addedThisMonth,
       totalFavorites: totalFavorites[0]?.total ?? 0,
+      totalVisitors: totalVisitorsAgg[0]?.total ?? 0,
+      todayVisitors: todayVisit?.uniqueVisitors ?? 0,
+      todayPageLoads: todayVisit?.visits ?? 0,
       top5: top5.map((p) => ({
         _id: p._id,
         title: p.title,
@@ -68,6 +95,11 @@ export async function getAdminStats(req, res) {
         favorites: p.stats?.favorites ?? 0,
       })),
       dailyViews: dailyViews.map((d) => ({ date: d._id, views: d.views, projects: d.count })),
+      dailyVisitors: dailyVisitsRaw.map((d) => ({
+        date: d.date,
+        visitors: d.uniqueVisitors,
+        pageLoads: d.visits,
+      })),
     });
   } catch (e) {
     return res.status(500).json({ message: e.message });

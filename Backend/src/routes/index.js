@@ -9,6 +9,7 @@ import mediaRoutes from "./media.routes.js";
 import uploadRoutes from "./upload.routes.js";
 import settingsRoutes from "./settings.routes.js";
 import discordOauthRoutes from "./discord.oauth.routes.js";
+import visitsRoutes from "./visits.routes.js";
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use("/media", mediaRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/settings", settingsRoutes);
 router.use("/admin", adminRoutes);
+router.use("/visits", visitsRoutes);
 
 export default router;

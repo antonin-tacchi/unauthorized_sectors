@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -38,7 +38,18 @@ function AdminFallback() {
   );
 }
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export default function App() {
+  useEffect(() => {
+    // Track visit once per browser session
+    if (!sessionStorage.getItem("visit_tracked")) {
+      fetch(`${API_URL}/api/visits/track`, { method: "POST" })
+        .then(() => sessionStorage.setItem("visit_tracked", "1"))
+        .catch(() => {});
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <SettingsProvider>

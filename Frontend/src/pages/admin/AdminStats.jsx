@@ -20,7 +20,21 @@ function CustomTooltip({ active, payload, label }) {
   return (
     <div className="rounded-lg border border-white/10 bg-[#18181b] px-3 py-2 text-xs text-white/80">
       <div className="text-white/40 mb-1">{label}</div>
-      <div><span className="text-[#6b5cff] font-semibold">{payload[0].value}</span> views</div>
+      <div><span className="font-semibold" style={{ color: payload[0].fill }}>{payload[0].value}</span> {payload[0].name}</div>
+    </div>
+  );
+}
+
+function VisitorTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-white/10 bg-[#18181b] px-3 py-2 text-xs text-white/80 space-y-1">
+      <div className="text-white/40 mb-1">{label}</div>
+      {payload.map((p) => (
+        <div key={p.name}>
+          <span className="font-semibold" style={{ color: p.fill }}>{p.value}</span> {p.name}
+        </div>
+      ))}
     </div>
   );
 }
@@ -48,10 +62,17 @@ export default function AdminStats() {
   }, [token]);
 
   if (loading) return (
-    <div className="p-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-24 rounded-xl bg-white/5 animate-pulse" />
-      ))}
+    <div className="p-8 space-y-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-24 rounded-xl bg-white/5 animate-pulse" />
+        ))}
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-24 rounded-xl bg-white/5 animate-pulse" />
+        ))}
+      </div>
     </div>
   );
 
@@ -65,13 +86,71 @@ export default function AdminStats() {
     <div className="p-8 max-w-5xl space-y-8">
       <h1 className="text-2xl font-extrabold text-white/90">Statistics</h1>
 
-      {/* Widgets */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total views"      value={data.totalViews.toLocaleString()}    color="#6b5cff" />
-        <StatCard label="Published"        value={data.totalProjects}                  color="#22c55e" />
-        <StatCard label="Added this month" value={data.addedThisMonth}                 color="#f59e0b" />
-        <StatCard label="Total favorites"  value={data.totalFavorites.toLocaleString()} color="#ef4444" />
+      {/* Project stats */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-white/25 mb-3">Projects</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard label="Total views"      value={data.totalViews.toLocaleString()}     color="#6b5cff" />
+          <StatCard label="Published"        value={data.totalProjects}                   color="#22c55e" />
+          <StatCard label="Added this month" value={data.addedThisMonth}                  color="#f59e0b" />
+          <StatCard label="Total favorites"  value={data.totalFavorites.toLocaleString()} color="#ef4444" />
+        </div>
       </div>
+
+      {/* Visitor stats */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-white/25 mb-3">Visitors</p>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <StatCard
+            label="Total visitors"
+            value={data.totalVisitors.toLocaleString()}
+            sub="Unique visitors all time"
+            color="#34d399"
+          />
+          <StatCard
+            label="Today — visitors"
+            value={data.todayVisitors.toLocaleString()}
+            sub="Unique visitors today"
+            color="#38bdf8"
+          />
+          <StatCard
+            label="Today — page loads"
+            value={data.todayPageLoads.toLocaleString()}
+            sub="Total sessions today"
+            color="#a78bfa"
+          />
+        </div>
+      </div>
+
+      {/* Visitors chart (last 30 days) */}
+      {data.dailyVisitors?.length > 0 && (
+        <div className="rounded-xl border border-white/8 bg-[#0f1420] p-5">
+          <div className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-4">
+            Unique visitors — last 30 days
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={data.dailyVisitors} barSize={12}>
+              <XAxis
+                dataKey="date"
+                tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10 }}
+                tickFormatter={(d) => d.slice(5)}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis hide />
+              <Tooltip content={<VisitorTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+              <Bar dataKey="visitors" name="visitors" radius={[4, 4, 0, 0]}>
+                {data.dailyVisitors.map((entry, i) => (
+                  <Cell
+                    key={i}
+                    fill={entry.date === new Date().toISOString().slice(0, 10) ? "#34d399" : "rgba(52,211,153,0.4)"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Top 5 */}
       <div className="rounded-xl border border-white/8 bg-[#0f1420] p-5">
@@ -98,7 +177,7 @@ export default function AdminStats() {
         </div>
       </div>
 
-      {/* Chart */}
+      {/* Project views chart */}
       {data.dailyViews.length > 0 && (
         <div className="rounded-xl border border-white/8 bg-[#0f1420] p-5">
           <div className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-4">
@@ -115,7 +194,7 @@ export default function AdminStats() {
               />
               <YAxis hide />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-              <Bar dataKey="views" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="views" name="views" radius={[4, 4, 0, 0]}>
                 {data.dailyViews.map((_, i) => (
                   <Cell key={i} fill={i === data.dailyViews.length - 1 ? "#6b5cff" : "rgba(107,92,255,0.4)"} />
                 ))}
