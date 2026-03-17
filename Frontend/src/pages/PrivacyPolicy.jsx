@@ -15,10 +15,12 @@ function Section({ title, children }) {
 
 export default function PrivacyPolicy() {
   const { t } = useTranslation();
+  const p = (k) => t(`legal.privacy.${k}`);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <Helmet>
-        <title>Politique de confidentialité — Antonin TACCHI</title>
+        <title>{t("legal.privacyTitle")} — Antonin TACCHI</title>
         <meta name="robots" content="noindex" />
       </Helmet>
 
@@ -28,93 +30,73 @@ export default function PrivacyPolicy() {
         <p className="mt-2 text-sm text-white/40">{t("legal.lastUpdated")}</p>
       </div>
 
-      <Section title="1. Responsable du traitement">
+      <Section title={p("s1Title")}>
         <p>
-          Le responsable du traitement des données personnelles collectées sur ce site est
-          Antonin TACCHI, joignable à l'adresse : <strong className="text-white/80">antonin.tacchi2005@gmail.com</strong>
+          {p("s1p1")} <strong className="text-white/80">antonin.tacchi2005@gmail.com</strong>
         </p>
       </Section>
 
-      <Section title="2. Données collectées">
-        <p>Ce site collecte les données personnelles suivantes :</p>
+      <Section title={p("s2Title")}>
+        <p>{p("s2Intro")}</p>
         <ul className="space-y-2 pl-4 list-disc list-inside marker:text-white/20">
           <li>
-            <strong className="text-white/70">Formulaire de contact / commande :</strong> prénom, adresse email,
-            objet de la demande, budget, description du projet. Ces données sont transmises via Discord Webhook
-            et stockées temporairement dans notre base de données.
+            <strong className="text-white/70">{p("s2Item1Label")}</strong> {p("s2Item1Text")}
           </li>
           <li>
-            <strong className="text-white/70">Connexion Discord OAuth2 :</strong> identifiant Discord,
-            nom d'utilisateur Discord (si vous utilisez le bouton "Connect with Discord"). Ces données
-            sont utilisées uniquement pour vous ajouter au serveur Discord.
+            <strong className="text-white/70">{p("s2Item2Label")}</strong> {p("s2Item2Text")}
           </li>
           <li>
-            <strong className="text-white/70">Données de navigation :</strong> adresse IP, navigateur,
-            pages visitées (collectées par l'hébergeur à des fins de sécurité et de statistiques).
+            <strong className="text-white/70">{p("s2Item3Label")}</strong> {p("s2Item3Text")}
           </li>
         </ul>
       </Section>
 
-      <Section title="3. Base légale du traitement">
-        <p>Le traitement de vos données repose sur :</p>
+      <Section title={p("s3Title")}>
+        <p>{p("s3Intro")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li>Votre <strong className="text-white/70">consentement</strong> lors de la soumission du formulaire</li>
-          <li>L'<strong className="text-white/70">intérêt légitime</strong> pour répondre à vos demandes</li>
-          <li>L'<strong className="text-white/70">exécution d'un contrat</strong> dans le cadre d'une commission</li>
+          <li><strong className="text-white/70">{p("s3Item1Bold")}</strong> {p("s3Item1")}</li>
+          <li><strong className="text-white/70">{p("s3Item2Bold")}</strong> {p("s3Item2")}</li>
+          <li><strong className="text-white/70">{p("s3Item3Bold")}</strong> {p("s3Item3")}</li>
         </ul>
       </Section>
 
-      <Section title="4. Durée de conservation">
+      <Section title={p("s4Title")}>
         <p>
-          Les données du formulaire de contact sont conservées pendant la durée nécessaire au traitement
-          de votre demande, et au maximum <strong className="text-white/70">3 ans</strong> à compter du
-          dernier contact.
+          {p("s4p1")} <strong className="text-white/70">{p("s4p1Bold")}</strong> {p("s4p1After")}
         </p>
-        <p>
-          Les données Discord sont uniquement utilisées lors de la connexion OAuth2 et ne sont pas
-          stockées de façon permanente sur nos serveurs au-delà du ticket associé.
-        </p>
+        <p>{p("s4p2")}</p>
       </Section>
 
-      <Section title="5. Partage des données">
-        <p>Vos données personnelles ne sont pas vendues ni cédées à des tiers. Elles peuvent être
-        transmises aux sous-traitants techniques suivants, dans le strict cadre de leur mission :</p>
+      <Section title={p("s5Title")}>
+        <p>{p("s5p1")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li>Railway Corp (hébergement API)</li>
-          <li>Discord Inc (intégration OAuth2 et tickets)</li>
-          <li>Cloudinary (hébergement des médias)</li>
+          <li>{p("s5Item1")}</li>
+          <li>{p("s5Item2")}</li>
+          <li>{p("s5Item3")}</li>
         </ul>
       </Section>
 
-      <Section title="6. Vos droits">
-        <p>
-          Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des
-          droits suivants concernant vos données personnelles :
-        </p>
+      <Section title={p("s6Title")}>
+        <p>{p("s6Intro")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li>Droit d'<strong className="text-white/70">accès</strong> à vos données</li>
-          <li>Droit de <strong className="text-white/70">rectification</strong></li>
-          <li>Droit à l'<strong className="text-white/70">effacement</strong> ("droit à l'oubli")</li>
-          <li>Droit à la <strong className="text-white/70">limitation</strong> du traitement</li>
-          <li>Droit à la <strong className="text-white/70">portabilité</strong> de vos données</li>
-          <li>Droit d'<strong className="text-white/70">opposition</strong> au traitement</li>
+          <li><strong className="text-white/70">{p("s6Item1Bold")}</strong> {p("s6Item1")}</li>
+          <li><strong className="text-white/70">{p("s6Item2Bold")}</strong> {p("s6Item2")}</li>
+          <li><strong className="text-white/70">{p("s6Item3Bold")}</strong> {p("s6Item3")}</li>
+          <li><strong className="text-white/70">{p("s6Item4Bold")}</strong> {p("s6Item4")}</li>
+          <li><strong className="text-white/70">{p("s6Item5Bold")}</strong> {p("s6Item5")}</li>
+          <li><strong className="text-white/70">{p("s6Item6Bold")}</strong> {p("s6Item6")}</li>
         </ul>
         <p>
-          Pour exercer ces droits, contactez-nous à <strong className="text-white/80">antonin.tacchi2005@gmail.com</strong>.
-          Vous pouvez également introduire une réclamation auprès de la CNIL (Commission Nationale de
-          l'Informatique et des Libertés) sur <strong className="text-white/70">cnil.fr</strong>.
+          {p("s6p2")} <strong className="text-white/80">antonin.tacchi2005@gmail.com</strong>. {p("s6p2After")}
         </p>
       </Section>
 
-      <Section title="7. Cookies">
+      <Section title={p("s7Title")}>
         <p>
-          Ce site utilise uniquement un cookie technique <strong className="text-white/70">httpOnly</strong> de
-          session administrateur (refresh_token), qui n'est actif que lorsque vous êtes connecté à
-          l'espace admin. Aucun cookie de tracking ou publicitaire n'est utilisé.
+          <strong className="text-white/70">{p("s7p1Bold")}</strong> — {p("s7p1")}
         </p>
         <p>
-          Les favoris projets sont stockés dans le <strong className="text-white/70">localStorage</strong> de
-          votre navigateur, sans transmission vers nos serveurs.
+          <strong className="text-white/70">{p("s7p2Bold")}</strong> — {p("s7p2")}
         </p>
       </Section>
 

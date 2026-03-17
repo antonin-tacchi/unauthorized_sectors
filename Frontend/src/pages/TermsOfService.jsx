@@ -15,10 +15,12 @@ function Section({ title, children }) {
 
 export default function TermsOfService() {
   const { t } = useTranslation();
+  const s = (k) => t(`legal.terms.${k}`);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <Helmet>
-        <title>Conditions d'utilisation — Antonin TACCHI</title>
+        <title>{t("legal.termsTitle")} — Antonin TACCHI</title>
         <meta name="robots" content="noindex" />
       </Helmet>
 
@@ -28,86 +30,61 @@ export default function TermsOfService() {
         <p className="mt-2 text-sm text-white/40">{t("legal.lastUpdated")}</p>
       </div>
 
-      <Section title="1. Objet">
+      <Section title={s("s1Title")}>
         <p>
-          Les présentes conditions d'utilisation régissent l'accès et l'utilisation du site
-          <strong className="text-white/80"> antonin-tacchi.com</strong>, portfolio et plateforme de
-          commissions de mapping FiveM exploité par Antonin TACCHI (ci-après "le Prestataire").
+          {s("s1p1")}
         </p>
-        <p>
-          En accédant au site ou en soumettant une demande de commission, vous acceptez sans réserve
-          les présentes conditions.
-        </p>
+        <p>{s("s1p2")}</p>
       </Section>
 
-      <Section title="2. Services proposés">
-        <p>Le site propose les services suivants :</p>
+      <Section title={s("s2Title")}>
+        <p>{s("s2Intro")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li>Consultation du portfolio de travaux de mapping FiveM (MLO, Exterior, YMAP…)</li>
-          <li>Demandes de commissions de mapping personnalisé via le formulaire de contact</li>
-          <li>Accès à un serveur Discord communautaire via intégration OAuth2</li>
+          <li>{s("s2Item1")}</li>
+          <li>{s("s2Item2")}</li>
+          <li>{s("s2Item3")}</li>
         </ul>
       </Section>
 
-      <Section title="3. Commissions — conditions spécifiques">
-        <p><strong className="text-white/70">3.1 Processus de commande</strong></p>
+      <Section title={s("s3Title")}>
+        <p><strong className="text-white/70">{s("s3_1Bold")}</strong></p>
+        <p>{s("s3_1")}</p>
+        <p><strong className="text-white/70">{s("s3_2Bold")}</strong></p>
+        <p>{s("s3_2")}</p>
+        <p><strong className="text-white/70">{s("s3_3Bold")}</strong></p>
+        <p>{s("s3_3")}</p>
+        <p><strong className="text-white/70">{s("s3_4Bold")}</strong></p>
         <p>
-          Toute commission débute par une demande via le formulaire de contact. Le Prestataire se
-          réserve le droit d'accepter ou refuser toute demande sans avoir à se justifier.
-        </p>
-        <p><strong className="text-white/70">3.2 Devis et paiement</strong></p>
-        <p>
-          Un devis personnalisé est établi après étude de la demande. Un acompte peut être demandé
-          avant le démarrage des travaux. Le solde est dû à la livraison.
-        </p>
-        <p><strong className="text-white/70">3.3 Livraison et révisions</strong></p>
-        <p>
-          Les délais de livraison sont indicatifs et communiqués lors du devis. Le nombre de révisions
-          incluses est précisé dans le devis. Des révisions supplémentaires peuvent être facturées.
-        </p>
-        <p><strong className="text-white/70">3.4 Propriété intellectuelle des travaux commandés</strong></p>
-        <p>
-          À réception du paiement intégral, le client obtient une <strong className="text-white/70">licence d'utilisation
-          non-exclusive</strong> sur le travail livré, dans le cadre d'une utilisation sur serveur FiveM privé.
-          Toute revente, redistribution ou publication des fichiers livrés est strictement interdite sans
-          accord écrit préalable.
+          {s("s3_4").split(s("s3_4LicenseBold"))[0]}
+          <strong className="text-white/70">{s("s3_4LicenseBold")}</strong>
+          {s("s3_4").split(s("s3_4LicenseBold"))[1]}
         </p>
       </Section>
 
-      <Section title="4. Comportement de l'utilisateur">
-        <p>Il est interdit d'utiliser ce site pour :</p>
+      <Section title={s("s4Title")}>
+        <p>{s("s4Intro")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li>Toute activité illégale ou frauduleuse</li>
-          <li>Envoyer des contenus offensants, diffamatoires ou abusifs via les formulaires</li>
-          <li>Tenter d'accéder aux parties administratives sans autorisation</li>
-          <li>Scraper ou reproduire le contenu du portfolio sans autorisation</li>
+          <li>{s("s4Item1")}</li>
+          <li>{s("s4Item2")}</li>
+          <li>{s("s4Item3")}</li>
+          <li>{s("s4Item4")}</li>
         </ul>
       </Section>
 
-      <Section title="5. Limitation de responsabilité">
-        <p>
-          Le Prestataire ne saurait être tenu responsable des dommages indirects liés à l'utilisation
-          du site ou des travaux livrés. La responsabilité totale du Prestataire est limitée au montant
-          payé pour la commission concernée.
-        </p>
-        <p>
-          Le Prestataire ne garantit pas la compatibilité des travaux livrés avec les futures mises à
-          jour de FiveM ou des serveurs tiers.
-        </p>
+      <Section title={s("s5Title")}>
+        <p>{s("s5p1")}</p>
+        <p>{s("s5p2")}</p>
       </Section>
 
-      <Section title="6. Modification des conditions">
-        <p>
-          Le Prestataire se réserve le droit de modifier les présentes conditions à tout moment.
-          Les conditions applicables sont celles en vigueur à la date de la demande de commission.
-        </p>
+      <Section title={s("s6Title")}>
+        <p>{s("s6p1")}</p>
       </Section>
 
-      <Section title="7. Droit applicable et juridiction">
+      <Section title={s("s7Title")}>
         <p>
-          Les présentes conditions sont soumises au <strong className="text-white/70">droit français</strong>.
-          Tout litige sera soumis aux tribunaux compétents du ressort de la résidence du Prestataire,
-          après tentative de résolution amiable.
+          {s("s7p1").split(s("s7LawBold"))[0]}
+          <strong className="text-white/70">{s("s7LawBold")}</strong>
+          {s("s7p1").split(s("s7LawBold"))[1]}
         </p>
       </Section>
 

@@ -15,10 +15,12 @@ function Section({ title, children }) {
 
 export default function LegalNotices() {
   const { t } = useTranslation();
+  const n = (k) => t(`legal.notices.${k}`);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <Helmet>
-        <title>Mentions légales — Antonin TACCHI</title>
+        <title>{t("legal.legalTitle")} — Antonin TACCHI</title>
         <meta name="robots" content="noindex" />
       </Helmet>
 
@@ -28,58 +30,38 @@ export default function LegalNotices() {
         <p className="mt-2 text-sm text-white/40">{t("legal.lastUpdated")}</p>
       </div>
 
-      <Section title="1. Éditeur du site">
-        <p>Le site <strong className="text-white/80">antonin-tacchi.com</strong> est édité par :</p>
+      <Section title={n("s1Title")}>
+        <p>{n("s1Intro")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li><strong className="text-white/70">Nom :</strong> Antonin TACCHI</li>
-          <li><strong className="text-white/70">Statut :</strong> Particulier — créateur freelance</li>
-          <li><strong className="text-white/70">Email :</strong> antonin.tacchi2005@gmail.com</li>
-          <li><strong className="text-white/70">Localisation :</strong> France</li>
+          <li><strong className="text-white/70">{n("s1Name")} :</strong> {n("s1NameVal")}</li>
+          <li><strong className="text-white/70">{n("s1Status")} :</strong> {n("s1StatusVal")}</li>
+          <li><strong className="text-white/70">{n("s1Email")} :</strong> antonin.tacchi2005@gmail.com</li>
+          <li><strong className="text-white/70">{n("s1Location")} :</strong> {n("s1LocationVal")}</li>
         </ul>
       </Section>
 
-      <Section title="2. Hébergement">
-        <p>Le site est hébergé par :</p>
+      <Section title={n("s2Title")}>
+        <p>{n("s2Intro")}</p>
         <ul className="space-y-1 pl-4 list-disc list-inside marker:text-white/20">
-          <li><strong className="text-white/70">Frontend :</strong> Hostinger International Ltd, 61 Lordou Vironos Street, 6023 Larnaca, Chypre</li>
-          <li><strong className="text-white/70">Backend / API :</strong> Railway Corp, 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis</li>
-          <li><strong className="text-white/70">Médias :</strong> Cloudinary Ltd, 3400 Central Expy, Suite 110, Santa Clara, CA 95051, États-Unis</li>
+          <li><strong className="text-white/70">{n("s2Frontend")} :</strong> Hostinger International Ltd, 61 Lordou Vironos Street, 6023 Larnaca, Cyprus</li>
+          <li><strong className="text-white/70">{n("s2Backend")} :</strong> Railway Corp, 340 S Lemon Ave #4133, Walnut, CA 91789, USA</li>
+          <li><strong className="text-white/70">{n("s2Media")} :</strong> Cloudinary Ltd, 3400 Central Expy, Suite 110, Santa Clara, CA 95051, USA</li>
         </ul>
       </Section>
 
-      <Section title="3. Propriété intellectuelle">
-        <p>
-          L'ensemble du contenu du site (textes, images, modèles 3D, rendus, code source, graphismes)
-          est la propriété exclusive d'Antonin TACCHI, sauf mention contraire.
-        </p>
-        <p>
-          Toute reproduction, représentation, modification, publication ou transmission de tout ou
-          partie du contenu, par quelque moyen que ce soit, est strictement interdite sans autorisation
-          écrite préalable de l'éditeur.
-        </p>
-        <p>
-          Les travaux présentés dans le portfolio ont été réalisés dans l'univers de GTA V / FiveM.
-          GTA V est une marque déposée de Rockstar Games. Ce site n'est pas affilié à Rockstar Games.
-        </p>
+      <Section title={n("s3Title")}>
+        <p>{n("s3p1")}</p>
+        <p>{n("s3p2")}</p>
+        <p>{n("s3p3")}</p>
       </Section>
 
-      <Section title="4. Responsabilité">
-        <p>
-          Antonin TACCHI s'efforce de maintenir les informations de ce site à jour et exactes.
-          Cependant, il ne saurait être tenu responsable des erreurs ou omissions, ni des dommages
-          directs ou indirects résultant de l'utilisation du site.
-        </p>
-        <p>
-          Des liens vers des sites tiers peuvent être présents. L'éditeur ne contrôle pas le contenu
-          de ces sites et décline toute responsabilité quant à leur contenu.
-        </p>
+      <Section title={n("s4Title")}>
+        <p>{n("s4p1")}</p>
+        <p>{n("s4p2")}</p>
       </Section>
 
-      <Section title="5. Droit applicable">
-        <p>
-          Les présentes mentions légales sont soumises au droit français. En cas de litige, les
-          tribunaux français seront seuls compétents.
-        </p>
+      <Section title={n("s5Title")}>
+        <p>{n("s5p1")}</p>
       </Section>
 
       <div className="mt-12 pt-6 border-t border-white/10 flex flex-wrap gap-4 text-xs text-white/30">
