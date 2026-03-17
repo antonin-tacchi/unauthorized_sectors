@@ -40,6 +40,9 @@ export default function AdminProjects() {
   async function handleDelete(project) {
     if (!window.confirm(`Delete "${project.title}"?`)) return;
     setDeleting(project._id);
+    // Optimistic update — retire immédiatement de la liste
+    setItems((prev) => prev.filter((p) => p._id !== project._id));
+    setTotal((prev) => prev - 1);
     try {
       const res = await fetch(`${API_URL}/api/projects/${project._id}`, {
         method: "DELETE",
@@ -47,9 +50,10 @@ export default function AdminProjects() {
       });
       if (!res.ok) throw new Error("Delete failed");
       toast.success(`"${project.title}" deleted`);
-      await load(page);
     } catch (err) {
       toast.error(err.message || "Delete failed");
+      // Revert en cas d'erreur
+      await load(page);
     } finally {
       setDeleting(null);
     }
