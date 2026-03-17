@@ -27,8 +27,8 @@ const SUBJECTS = [
   { label: "Optimization" },
   { label: "— Support & Other —", disabled: true },
   { label: "Bug Report" },
-  { label: "Réclamation" },
-  { label: "Question générale" },
+  { label: "Réclamation", value: "Other" },
+  { label: "Question générale", value: "Other" },
   { label: "Other" },
 ];
 
@@ -224,7 +224,7 @@ export default function Contact() {
               s.disabled ? (
                 <option key={s.label} disabled className="bg-[#0f1117] text-white/30">{s.label}</option>
               ) : (
-                <option key={s.label} value={s.label} className="bg-[#0f1117]">{s.label}</option>
+                <option key={s.label} value={s.value ?? s.label} className="bg-[#0f1117]">{s.label}</option>
               )
             )}
           </select>

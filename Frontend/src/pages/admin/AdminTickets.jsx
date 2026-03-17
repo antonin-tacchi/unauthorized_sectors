@@ -46,7 +46,10 @@ export default function AdminTickets() {
   const [filterPriority, setFilterPriority] = useState("");
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
-  const [detailLoading, setDetailLoading] = useState(false);
+
+  // Multi-select state
+  const [checkedIds, setCheckedIds] = useState(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   // Panel state
   const [newStatus, setNewStatus] = useState("");
@@ -88,6 +91,9 @@ export default function AdminTickets() {
 
   useEffect(() => { load(); }, [load]);
 
+  // Clear checked when page/filters change
+  useEffect(() => { setCheckedIds(new Set()); }, [page, filterStatus, filterPriority]);
+
   async function openDetail(ticket) {
     setSelected(ticket);
     setNewStatus(ticket.status);
@@ -111,7 +117,7 @@ export default function AdminTickets() {
       const updated = await res.json();
       setSelected(updated);
       setTickets((prev) => prev.map((t) => (t._id === updated._id ? updated : t)));
-      load({ silent: true, syncSelectedId: updated._id }); // refresh counts silently
+      load({ silent: true, syncSelectedId: updated._id });
     } catch {
       // noop
     } finally {
@@ -126,9 +132,48 @@ export default function AdminTickets() {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (selected?._id === id) setSelected(null);
+    setCheckedIds((prev) => { const s = new Set(prev); s.delete(id); return s; });
     load();
   }
 
+  async function handleBulkDelete() {
+    if (checkedIds.size === 0) return;
+    if (!confirm(`Supprimer ${checkedIds.size} ticket(s) ? Les channels Discord associés seront aussi supprimés.`)) return;
+    setBulkDeleting(true);
+    try {
+      await fetch(`${API_URL}/api/tickets/bulk`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ids: [...checkedIds] }),
+      });
+      if (selected && checkedIds.has(selected._id)) setSelected(null);
+      setCheckedIds(new Set());
+      load();
+    } finally {
+      setBulkDeleting(false);
+    }
+  }
+
+  function toggleCheck(id, e) {
+    e.stopPropagation();
+    setCheckedIds((prev) => {
+      const s = new Set(prev);
+      s.has(id) ? s.delete(id) : s.add(id);
+      return s;
+    });
+  }
+
+  function toggleAll(e) {
+    e.stopPropagation();
+    if (checkedIds.size === tickets.length) {
+      setCheckedIds(new Set());
+    } else {
+      setCheckedIds(new Set(tickets.map((t) => t._id)));
+    }
+  }
+
+  const allChecked = tickets.length > 0 && checkedIds.size === tickets.length;
+  const someChecked = checkedIds.size > 0 && !allChecked;
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
@@ -146,8 +191,8 @@ export default function AdminTickets() {
         <StatCard label="Closed"      value={statusCounts.closed}         color="text-white/40" />
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* Filters + bulk action bar */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         <select
           value={filterStatus}
           onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
@@ -172,6 +217,26 @@ export default function AdminTickets() {
             Clear
           </button>
         )}
+
+        {/* Bulk delete bar — shown when items are checked */}
+        {checkedIds.size > 0 && (
+          <div className="ml-auto flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-1.5">
+            <span className="text-sm text-white/60">{checkedIds.size} sélectionné{checkedIds.size > 1 ? "s" : ""}</span>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkDeleting}
+              className="rounded-md bg-red-500/80 hover:bg-red-500 px-3 py-1 text-xs font-semibold text-white transition disabled:opacity-50"
+            >
+              {bulkDeleting ? "Suppression…" : "Supprimer"}
+            </button>
+            <button
+              onClick={() => setCheckedIds(new Set())}
+              className="text-white/30 hover:text-white/60 transition text-sm"
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex gap-4">
@@ -181,6 +246,15 @@ export default function AdminTickets() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/8 bg-white/3">
+                  <th className="px-4 py-2.5 w-8">
+                    <input
+                      type="checkbox"
+                      checked={allChecked}
+                      ref={(el) => { if (el) el.indeterminate = someChecked; }}
+                      onChange={toggleAll}
+                      className="accent-[#6b5cff] cursor-pointer"
+                    />
+                  </th>
                   <th className="text-left px-4 py-2.5 text-xs font-semibold text-white/35 uppercase tracking-widest">Ticket</th>
                   <th className="text-left px-4 py-2.5 text-xs font-semibold text-white/35 uppercase tracking-widest">Subject</th>
                   <th className="text-left px-4 py-2.5 text-xs font-semibold text-white/35 uppercase tracking-widest hidden md:table-cell">Priority</th>
@@ -193,7 +267,7 @@ export default function AdminTickets() {
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i} className="border-b border-white/5">
-                      {Array.from({ length: 5 }).map((_, j) => (
+                      {Array.from({ length: 6 }).map((_, j) => (
                         <td key={j} className="px-4 py-3">
                           <div className="h-4 rounded bg-white/8 animate-pulse" />
                         </td>
@@ -202,7 +276,7 @@ export default function AdminTickets() {
                   ))
                 ) : tickets.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-white/30 text-sm">
+                    <td colSpan={7} className="px-4 py-12 text-center text-white/30 text-sm">
                       No tickets found.
                     </td>
                   </tr>
@@ -210,8 +284,16 @@ export default function AdminTickets() {
                   <tr
                     key={t._id}
                     onClick={() => openDetail(t)}
-                    className={`border-b border-white/5 cursor-pointer transition hover:bg-white/3 ${selected?._id === t._id ? "bg-white/4" : ""}`}
+                    className={`border-b border-white/5 cursor-pointer transition hover:bg-white/3 ${selected?._id === t._id ? "bg-white/4" : ""} ${checkedIds.has(t._id) ? "bg-[#6b5cff]/5" : ""}`}
                   >
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={checkedIds.has(t._id)}
+                        onChange={(e) => toggleCheck(t._id, e)}
+                        className="accent-[#6b5cff] cursor-pointer"
+                      />
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs text-[#a89fff]">{t.ticketNumber}</td>
                     <td className="px-4 py-3 text-white/75 max-w-[160px] truncate">{t.subject}</td>
                     <td className="px-4 py-3 hidden md:table-cell">
@@ -352,6 +434,13 @@ export default function AdminTickets() {
               className="rounded-lg bg-[#6b5cff] py-2 text-sm font-semibold text-white hover:brightness-110 transition disabled:opacity-60"
             >
               {saving ? "Saving…" : "Save changes"}
+            </button>
+
+            <button
+              onClick={() => handleDelete(selected._id)}
+              className="rounded-lg border border-red-500/20 py-2 text-sm font-semibold text-red-400/70 hover:text-red-400 hover:border-red-500/40 transition"
+            >
+              Delete ticket
             </button>
           </div>
         )}

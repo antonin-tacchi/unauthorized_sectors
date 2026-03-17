@@ -6,6 +6,7 @@ import {
   getTicketById,
   updateTicketStatus,
   deleteTicket,
+  bulkDeleteTickets,
 } from "../controllers/ticket.controller.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -23,6 +24,7 @@ router.post("/", ticketLimiter, createTicket);
 router.get("/", requireAuth, getTickets);
 router.get("/:id", requireAuth, getTicketById);
 router.patch("/:id/status", requireAuth, updateTicketStatus);
+router.delete("/bulk", requireAuth, bulkDeleteTickets);
 router.delete("/:id", requireAuth, deleteTicket);
 
 export default router;

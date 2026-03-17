@@ -82,7 +82,10 @@
       "Bash(docker stop:*)",
       "Bash(curl -s -X POST http://localhost:3000/api/tickets -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test@test.com\"\",\"\"subject\"\":\"\"Custom MLO\"\",\"\"priority\"\":\"\"low\"\",\"\"message\"\":\"\"test ticket\"\"}')",
       "Bash(docker rm:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "mcp__chrome-devtools__fill_form",
+      "Bash(docker compose:*)",
+      "Bash(docker exec:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\nenin\\Documents\\.Perso\\unauthorized_sectors\\.claire\\worktrees\\nice-cori\\Frontend\\src\\components",

@@ -1,6 +1,6 @@
 import Ticket from "../models/Ticket.js";
 import { sendTicketToDiscord, sendStatusUpdateToDiscord } from "../services/discord.service.js";
-import { createTicketChannel, archiveTicketChannel } from "../services/discord.bot.js";
+import { createTicketChannel, archiveTicketChannel, deleteTicketChannel } from "../services/discord.bot.js";
 
 // POST /api/tickets  (public)
 export async function createTicket(req, res) {
@@ -10,7 +10,15 @@ export async function createTicket(req, res) {
     return res.status(400).json({ message: "email, subject, and message are required." });
   }
 
-  const ticket = await Ticket.create({ email, discord, subject, budget, timeline, message });
+  let ticket;
+  try {
+    ticket = await Ticket.create({ email, discord, subject, budget, timeline, message });
+  } catch (err) {
+    const msg = err.name === "ValidationError"
+      ? Object.values(err.errors).map((e) => e.message).join(", ")
+      : "Erreur lors de la création du ticket.";
+    return res.status(400).json({ message: msg });
+  }
 
   // Fire-and-forget Discord notifications
   sendTicketToDiscord(ticket)
@@ -88,5 +96,20 @@ export async function updateTicketStatus(req, res) {
 export async function deleteTicket(req, res) {
   const ticket = await Ticket.findByIdAndDelete(req.params.id);
   if (!ticket) return res.status(404).json({ message: "Ticket not found." });
+  if (ticket.discordChannelId) deleteTicketChannel(ticket.discordChannelId).catch(() => {});
   return res.json({ message: "Ticket deleted." });
+}
+
+// DELETE /api/tickets/bulk  (admin)
+export async function bulkDeleteTickets(req, res) {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ message: "ids array required." });
+  }
+  const tickets = await Ticket.find({ _id: { $in: ids } }).lean();
+  await Ticket.deleteMany({ _id: { $in: ids } });
+  for (const ticket of tickets) {
+    if (ticket.discordChannelId) deleteTicketChannel(ticket.discordChannelId).catch(() => {});
+  }
+  return res.json({ deleted: tickets.length });
 }

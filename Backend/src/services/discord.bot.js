@@ -12,8 +12,43 @@ const TICKETS_CATEGORY_ID = process.env.DISCORD_TICKETS_CATEGORY_ID;
 const ARCHIVE_CATEGORY_ID = process.env.DISCORD_ARCHIVE_CATEGORY_ID;
 const ADMIN_USER_ID = process.env.DISCORD_ADMIN_USER_ID;
 
+// ── Role IDs (filled after running setup-server.js) ─────────────────────────
+const ROLE_IDS = {
+  french:  process.env.DISCORD_ROLE_FRENCH_ID,
+  english: process.env.DISCORD_ROLE_ENGLISH_ID,
+  fivem:   process.env.DISCORD_ROLE_FIVEM_ID,
+  mapper:  process.env.DISCORD_ROLE_MAPPER_ID,
+  client:  process.env.DISCORD_ROLE_CLIENT_ID,
+  visitor: process.env.DISCORD_ROLE_VISITOR_ID,
+  staff:   process.env.DISCORD_ROLE_STAFF_ID,
+};
+
+// ── Channel IDs for special behaviour ───────────────────────────────────────
+const LANG_SELECT_CHANNEL_ID = process.env.DISCORD_LANG_SELECT_CHANNEL_ID;
+const SCREENSHOT_CHANNEL_IDS = new Set(
+  [
+    process.env.DISCORD_SCREENSHOTS_FR_CHANNEL_ID,
+    process.env.DISCORD_SCREENSHOTS_EN_CHANNEL_ID,
+  ].filter(Boolean),
+);
+
+// Maps button customId → role key
+const LANG_BUTTONS = { "role:lang:french": "french", "role:lang:english": "english" };
+const PROFILE_BUTTONS = {
+  "role:profile:fivem":  "fivem",
+  "role:profile:mapper": "mapper",
+  "role:profile:client": "client",
+};
+// Language roles are mutually exclusive; profile roles stack
+const LANG_ROLE_KEYS = ["french", "english"];
+
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
 // ── Colors ──────────────────────────────────────────────────────────────────
@@ -48,6 +83,114 @@ function buildTicketEmbed(ticket) {
     .setFooter({ text: `Ticket ${ticket.ticketNumber}` })
     .setTimestamp(new Date(ticket.createdAt));
 }
+
+// ── Images-only enforcement for screenshot channels ───────────────────────────
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
+  if (!SCREENSHOT_CHANNEL_IDS.has(message.channelId)) return;
+
+  const hasImage = message.attachments.some((a) => a.contentType?.startsWith("image/"))
+    || message.embeds.some((e) => e.image || e.thumbnail);
+
+  if (!hasImage) {
+    try {
+      await message.delete();
+      const warn = await message.channel.send({
+        content: `<@${message.author.id}> 🖼️ Ce salon accepte uniquement des images. | This channel only accepts images.`,
+      });
+      setTimeout(() => warn.delete().catch(() => {}), 6000);
+    } catch (err) {
+      console.error("Failed to delete non-image message:", err.message);
+    }
+  }
+});
+
+// ── Auto-assign Visitor role on join ─────────────────────────────────────────
+client.on("guildMemberAdd", async (member) => {
+  if (member.guild.id !== GUILD_ID || !ROLE_IDS.visitor) return;
+  try {
+    await member.roles.add(ROLE_IDS.visitor, "Auto-assigned on join");
+    console.log(`Visitor role assigned to ${member.user.tag}`);
+  } catch (err) {
+    console.error("Failed to assign Visitor role:", err.message);
+  }
+});
+
+// ── Button handler: language + profile role selection ─────────────────────────
+client.on("interactionCreate", async (interaction) => {
+  if (interaction.isButton()) {
+    const { customId, member, guild } = interaction;
+
+    // Language selection (one-shot: once chosen, channel hidden for this member)
+    if (customId in LANG_BUTTONS) {
+      const selectedLangKey = LANG_BUTTONS[customId];
+      try {
+        await interaction.deferReply({ ephemeral: true });
+
+        // Fetch fresh member to ensure roles cache is up-to-date
+        const freshMember = await guild.members.fetch(interaction.user.id);
+
+        // Block if already has a language role — one-shot only
+        const alreadyHasLang = LANG_ROLE_KEYS.some(
+          (k) => ROLE_IDS[k] && freshMember.roles.cache.has(ROLE_IDS[k]),
+        );
+        if (alreadyHasLang) {
+          return interaction.editReply({
+            content: "❌ Tu as déjà choisi ta langue. | You already chose your language.",
+          });
+        }
+
+        // Add selected language role + remove visitor
+        if (ROLE_IDS[selectedLangKey]) await freshMember.roles.add(ROLE_IDS[selectedLangKey]);
+        if (ROLE_IDS.visitor) await freshMember.roles.remove(ROLE_IDS.visitor).catch(() => {});
+
+        // Hide the lang-select channel for this member (one-shot effect)
+        if (LANG_SELECT_CHANNEL_ID) {
+          try {
+            const langCh = await client.channels.fetch(LANG_SELECT_CHANNEL_ID);
+            await langCh.permissionOverwrites.create(freshMember, { ViewChannel: false });
+          } catch {
+            // Non-blocking
+          }
+        }
+
+        const isFrench = selectedLangKey === "french";
+        await interaction.editReply({
+          content: isFrench
+            ? "✅ Bienvenue ! Tu as maintenant accès aux salons francophones.\nPense à choisir ton profil dans **🎭・choisir-son-profil**."
+            : "✅ Welcome! You now have access to the English channels.\nDon't forget to pick your profile in **🎭・choisir-son-profil**.",
+        });
+      } catch (err) {
+        console.error("Language role assignment failed:", err.message);
+        if (!interaction.replied) await interaction.reply({ content: "❌ Error assigning role.", ephemeral: true });
+      }
+      return;
+    }
+
+    // Profile selection
+    if (customId in PROFILE_BUTTONS) {
+      const profileKey = PROFILE_BUTTONS[customId];
+      try {
+        await interaction.deferReply({ ephemeral: true });
+        const roleId = ROLE_IDS[profileKey];
+        if (!roleId) return interaction.editReply({ content: "❌ Role not configured." });
+
+        // Toggle: if already has role, remove it; otherwise add it
+        if (member.roles.cache.has(roleId)) {
+          await member.roles.remove(roleId);
+          await interaction.editReply({ content: `✅ Role **${profileKey}** removed.` });
+        } else {
+          await member.roles.add(roleId);
+          await interaction.editReply({ content: `✅ Role **${profileKey}** added!` });
+        }
+      } catch (err) {
+        console.error("Profile role assignment failed:", err.message);
+        if (!interaction.replied) await interaction.reply({ content: "❌ Error assigning role.", ephemeral: true });
+      }
+      return;
+    }
+  }
+});
 
 // ── Slash command handler ────────────────────────────────────────────────────
 client.on("interactionCreate", async (interaction) => {
@@ -255,6 +398,18 @@ export async function archiveTicketChannel(channelId) {
     });
   } catch (err) {
     console.error("Failed to archive ticket channel:", err.message);
+  }
+}
+
+// ── Delete a ticket channel entirely ─────────────────────────────────────────
+export async function deleteTicketChannel(channelId) {
+  if (!client.isReady() || !channelId) return;
+  try {
+    const channel = await client.channels.fetch(channelId).catch(() => null);
+    if (!channel) return;
+    await channel.delete("Ticket deleted from admin panel");
+  } catch (err) {
+    console.error("Failed to delete ticket channel:", err.message);
   }
 }
 
