@@ -2,10 +2,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Admin from "../models/Admin.js";
 
+const IS_PROD = process.env.NODE_ENV === "production";
+
 const COOKIE_OPTS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
+  secure: IS_PROD,
+  sameSite: IS_PROD ? "none" : "strict", // "none" requis pour cross-origin (Hostinger ↔ Railway)
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
   path: "/",
 };
@@ -55,13 +57,13 @@ export async function refresh(req, res) {
     res.cookie("refresh_token", newRefresh, COOKIE_OPTS);
     return res.json({ token: accessToken });
   } catch {
-    res.clearCookie("refresh_token", { path: "/" });
+    res.clearCookie("refresh_token", COOKIE_OPTS);
     return res.status(401).json({ message: "Invalid or expired refresh token" });
   }
 }
 
 export async function logout(req, res) {
-  res.clearCookie("refresh_token", { path: "/" });
+  res.clearCookie("refresh_token", COOKIE_OPTS);
   return res.json({ success: true });
 }
 
