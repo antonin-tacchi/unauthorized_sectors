@@ -4,7 +4,7 @@ import {
   EmbedBuilder,
   PermissionsBitField,
 } from "discord.js";
-import Ticket from "../models/Ticket.js";
+import { findList, findByTicketNumber, closeByTicketNumber } from "../models/Ticket.js";
 
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 const GUILD_ID = process.env.DISCORD_GUILD_ID;
@@ -204,10 +204,7 @@ client.on("interactionCreate", async (interaction) => {
       const priority = interaction.options.getString("priority");
       const status = interaction.options.getString("status") ?? "open";
 
-      const filter = { status };
-      if (priority) filter.priority = priority;
-
-      const tickets = await Ticket.find(filter).sort({ createdAt: -1 }).limit(15).lean();
+      const tickets = await findList({ status, priority, limit: 15 });
 
       if (!tickets.length) {
         return interaction.editReply({ content: "✅ Aucun ticket trouvé pour ces filtres." });
@@ -230,7 +227,7 @@ client.on("interactionCreate", async (interaction) => {
 
     if (sub === "view") {
       const number = interaction.options.getString("number").toUpperCase();
-      const ticket = await Ticket.findOne({ ticketNumber: number }).lean();
+      const ticket = await findByTicketNumber(number);
       if (!ticket) {
         return interaction.editReply({ content: `❌ Ticket \`${number}\` introuvable.` });
       }
@@ -239,11 +236,7 @@ client.on("interactionCreate", async (interaction) => {
 
     if (sub === "close") {
       const number = interaction.options.getString("number").toUpperCase();
-      const ticket = await Ticket.findOneAndUpdate(
-        { ticketNumber: number },
-        { status: "closed" },
-        { new: true },
-      ).lean();
+      const ticket = await closeByTicketNumber(number);
 
       if (!ticket) {
         return interaction.editReply({ content: `❌ Ticket \`${number}\` introuvable.` });

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Ticket from "../models/Ticket.js";
+import { findByTicketNumber } from "../models/Ticket.js";
 import { addUserToChannel } from "../services/discord.bot.js";
 
 const router = Router();
@@ -77,7 +77,7 @@ router.post("/exchange", async (req, res) => {
     if (ticketNumber) {
       (async () => {
         for (let attempt = 0; attempt < 5; attempt++) {
-          const ticket = await Ticket.findOne({ ticketNumber }).lean();
+          const ticket = await findByTicketNumber(ticketNumber);
           if (ticket?.discordChannelId) {
             addUserToChannel(ticket.discordChannelId, user.id).catch(() => {});
             break;
