@@ -16,7 +16,7 @@ const inputCls = "w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2.
 
 export default function AdminSettings() {
   const { token } = useAuth();
-  const [form, setForm] = useState({ discord: "", github: "", email: "", marketplace: "", tiktok: "", youtube: "" });
+  const [form, setForm] = useState({ discord: "", github: "", email: "", marketplace: "", tiktok: "", youtube: "", maintenanceMode: false });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -24,7 +24,7 @@ export default function AdminSettings() {
   useEffect(() => {
     fetch(`${API_URL}/api/settings`)
       .then((r) => r.json())
-      .then((d) => setForm({ discord: d.discord || "", github: d.github || "", email: d.email || "", marketplace: d.marketplace || "", tiktok: d.tiktok || "", youtube: d.youtube || "" }))
+      .then((d) => setForm({ discord: d.discord || "", github: d.github || "", email: d.email || "", marketplace: d.marketplace || "", tiktok: d.tiktok || "", youtube: d.youtube || "", maintenanceMode: !!d.maintenanceMode }))
       .catch(() => {});
   }, []);
 
@@ -37,7 +37,7 @@ export default function AdminSettings() {
       const res = await fetch(`${API_URL}/api/settings`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form }),
       });
       if (!res.ok) throw new Error("Save failed");
       setSaved(true);
@@ -54,6 +54,33 @@ export default function AdminSettings() {
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-white/90">Site Settings</h1>
         <p className="mt-1 text-sm text-white/35">Social links displayed in the footer — leave blank to hide.</p>
+      </div>
+
+      {/* Maintenance Mode toggle */}
+      <div className="mb-8 rounded-xl border border-white/8 bg-white/3 px-5 py-4 flex items-center justify-between">
+        <div>
+          <div className="font-semibold text-white/90">Mode maintenance</div>
+          <div className="text-xs text-white/35 mt-0.5">
+            {form.maintenanceMode
+              ? "🔴 Site fermé aux visiteurs — seuls les admins connectés peuvent accéder au site"
+              : "🟢 Site ouvert au public"}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setForm((f) => ({ ...f, maintenanceMode: !f.maintenanceMode }))}
+          className={[
+            "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200",
+            form.maintenanceMode ? "bg-[#6b5cff]" : "bg-white/15",
+          ].join(" ")}
+        >
+          <span
+            className={[
+              "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200",
+              form.maintenanceMode ? "translate-x-5" : "translate-x-0",
+            ].join(" ")}
+          />
+        </button>
       </div>
 
       <form onSubmit={handleSave} className="space-y-4">

@@ -1,6 +1,6 @@
 import SiteSettings from "../models/SiteSettings.js";
 
-const DEFAULTS = { _id: "singleton", discord: "", github: "", email: "", marketplace: "", tiktok: "", youtube: "" };
+const DEFAULTS = { _id: "singleton", discord: "", github: "", email: "", marketplace: "", tiktok: "", youtube: "", maintenanceMode: false };
 
 export async function getSettings(req, res) {
   try {
@@ -13,10 +13,10 @@ export async function getSettings(req, res) {
 
 export async function updateSettings(req, res) {
   try {
-    const { discord, github, email, marketplace, tiktok, youtube } = req.body;
+    const { discord, github, email, marketplace, tiktok, youtube, maintenanceMode } = req.body;
     const doc = await SiteSettings.findByIdAndUpdate(
       "singleton",
-      { $set: { discord, github, email, marketplace, tiktok, youtube } },
+      { $set: { discord, github, email, marketplace, tiktok, youtube, maintenanceMode: !!maintenanceMode } },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
     res.json(doc);

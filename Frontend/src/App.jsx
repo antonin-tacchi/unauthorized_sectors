@@ -1,11 +1,12 @@
-import { lazy, Suspense, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { SettingsProvider } from "./context/SettingsContext";
 import AdminRoute from "./routes/AdminRoute";
+import ComingSoon from "./pages/ComingSoon";
 
 import Layout from "./layout/Layout";
 import Home from "./pages/Home";
@@ -40,6 +41,32 @@ function AdminFallback() {
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
+function MaintenanceGate({ children }) {
+  const { admin, loading: authLoading } = useAuth();
+  const location = useLocation();
+  const [maintenance, setMaintenance] = useState(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/settings`)
+      .then((r) => r.json())
+      .then((d) => { setMaintenance(!!d.maintenanceMode); setSettingsLoaded(true); })
+      .catch(() => setSettingsLoaded(true));
+  }, []);
+
+  // Always let /admin/* through
+  const isAdminPath = location.pathname.startsWith("/admin");
+  if (isAdminPath) return children;
+
+  // Wait for both auth and settings to resolve
+  if (authLoading || !settingsLoaded) return null;
+
+  // If maintenance ON and not logged-in admin → Coming Soon
+  if (maintenance && !admin) return <ComingSoon />;
+
+  return children;
+}
+
 export default function App() {
   useEffect(() => {
     // Track visit once per browser session
@@ -69,6 +96,7 @@ export default function App() {
           error:   { iconTheme: { primary: "#ef4444", secondary: "#18181b" } },
         }}
       />
+      <MaintenanceGate>
       <Routes>
         {/* Public site */}
         <Route path="/" element={<Layout />}>
@@ -106,6 +134,7 @@ export default function App() {
           <Route path="tickets"  element={<Suspense fallback={null}><AdminTickets /></Suspense>} />
         </Route>
       </Routes>
+      </MaintenanceGate>
       </FavoritesProvider>
       </SettingsProvider>
     </AuthProvider>
