@@ -62,16 +62,32 @@ export default function About() {
   return (
     <div className="mx-auto max-w-5xl px-6 pb-16 pt-8">
       <Helmet>
-        <title>About — Antonin TACCHI</title>
+        <title>About — Antonin TACCHI | FiveM Mapper & Developer</title>
         <meta name="description" content="Learn more about Antonin TACCHI, professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
         <link rel="canonical" href="https://antonin-tacchi.com/about" />
-        <meta property="og:title" content="About — Antonin TACCHI" />
+        <meta property="og:title" content="About — Antonin TACCHI | FiveM Mapper & Developer" />
         <meta property="og:description" content="Professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
         <meta property="og:url" content="https://antonin-tacchi.com/about" />
         <meta property="og:type" content="profile" />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="About — Antonin TACCHI" />
+        <meta name="twitter:title" content="About — Antonin TACCHI | FiveM Mapper & Developer" />
         <meta name="twitter:description" content="Professional FiveM mapper & developer specializing in custom MLO, exterior mapping, and GTA V RP server development." />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          "url": "https://antonin-tacchi.com/about",
+          "name": "About Antonin TACCHI",
+          "mainEntity": {
+            "@type": "Person",
+            "@id": "https://antonin-tacchi.com/#person",
+            "name": "Antonin TACCHI",
+            "url": "https://antonin-tacchi.com/",
+            "jobTitle": "FiveM Mapper & Developer",
+            "description": "Professional FiveM mapper specializing in custom MLO interiors, exterior mapping, and GTA V RP server development. Using CodeWalker, Blender and FiveM tools.",
+            "knowsAbout": ["FiveM", "MLO Mapping", "GTA V Modding", "Blender", "CodeWalker", "3D Modeling", "Lua scripting", "RP Server Development"],
+            "skills": ["Custom MLO", "Exterior Mapping", "3D Modeling", "FiveM Development", "Performance Optimization"]
+          }
+        })}</script>
       </Helmet>
 
       {/* HERO */}

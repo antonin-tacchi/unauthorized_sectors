@@ -172,19 +172,48 @@ export default function ProjectDetails() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <Helmet>
-        <title>{project.title} — Antonin TACCHI</title>
+        <title>{project.title} — FiveM Mapping | Antonin TACCHI</title>
         <meta name="description" content={ogDesc} />
+        <link rel="canonical" href={`https://antonin-tacchi.com/projects/${project.slug}`} />
         {/* Open Graph */}
-        <meta property="og:title"       content={`${project.title} — Antonin TACCHI`} />
+        <meta property="og:title"       content={`${project.title} — FiveM Mapping | Antonin TACCHI`} />
         <meta property="og:description" content={ogDesc} />
-        <meta property="og:url"         content={pageUrl} />
+        <meta property="og:url"         content={`https://antonin-tacchi.com/projects/${project.slug}`} />
         <meta property="og:type"        content="article" />
         {ogImage && <meta property="og:image" content={ogImage} />}
         {/* Twitter Card */}
         <meta name="twitter:card"        content="summary_large_image" />
-        <meta name="twitter:title"       content={`${project.title} — Antonin TACCHI`} />
+        <meta name="twitter:title"       content={`${project.title} — FiveM Mapping | Antonin TACCHI`} />
         <meta name="twitter:description" content={ogDesc} />
         {ogImage && <meta name="twitter:image" content={ogImage} />}
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CreativeWork",
+          "url": `https://antonin-tacchi.com/projects/${project.slug}`,
+          "name": project.title,
+          "description": ogDesc,
+          "image": ogImage || undefined,
+          "author": {
+            "@type": "Person",
+            "@id": "https://antonin-tacchi.com/#person",
+            "name": "Antonin TACCHI"
+          },
+          "creator": {
+            "@type": "Person",
+            "@id": "https://antonin-tacchi.com/#person"
+          },
+          "genre": project.mappingType ? `FiveM ${project.mappingType.toUpperCase()} Mapping` : "FiveM Mapping",
+          "keywords": (project.tags || []).join(", ") || "FiveM, MLO, GTA V, RP mapping",
+          ...(project.createdAt ? { "dateCreated": new Date(project.createdAt).toISOString().split("T")[0] } : {}),
+          ...(project.pricing?.cents ? {
+            "offers": {
+              "@type": "Offer",
+              "price": (project.pricing.cents / 100).toFixed(2),
+              "priceCurrency": "USD",
+              "seller": { "@id": "https://antonin-tacchi.com/#person" }
+            }
+          } : {})
+        })}</script>
       </Helmet>
       {/* top */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.45fr_1fr] gap-6">

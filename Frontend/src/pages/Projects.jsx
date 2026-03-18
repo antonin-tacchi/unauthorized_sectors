@@ -173,16 +173,33 @@ export default function Projects() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <Helmet>
-        <title>Projects — Antonin TACCHI</title>
-        <meta name="description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
+        <title>FiveM Mapping Projects — MLO & Exterior | Antonin TACCHI</title>
+        <meta name="description" content="Browse all FiveM mapping projects by Antonin TACCHI — custom MLO interiors, exterior maps, and RP environments for GTA V servers." />
         <link rel="canonical" href="https://antonin-tacchi.com/projects" />
-        <meta property="og:title" content="Projects — Antonin TACCHI" />
-        <meta property="og:description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
+        <meta property="og:title" content="FiveM Mapping Projects — MLO & Exterior | Antonin TACCHI" />
+        <meta property="og:description" content="Browse custom MLO interiors, exterior maps, and RP environments for GTA V FiveM servers." />
         <meta property="og:url" content="https://antonin-tacchi.com/projects" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Projects — Antonin TACCHI" />
-        <meta name="twitter:description" content="Browse all FiveM mapping projects by Antonin TACCHI — MLO interiors, exterior maps, and custom RP environments for GTA V servers." />
+        <meta name="twitter:title" content="FiveM Mapping Projects — MLO & Exterior | Antonin TACCHI" />
+        <meta name="twitter:description" content="Browse custom MLO interiors, exterior maps, and RP environments for GTA V FiveM servers." />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "url": "https://antonin-tacchi.com/projects",
+          "name": "FiveM Mapping Projects by Antonin TACCHI",
+          "description": "Portfolio of custom FiveM MLO interiors, exterior maps, and RP environments for GTA V servers.",
+          "author": {
+            "@type": "Person",
+            "@id": "https://antonin-tacchi.com/#person",
+            "name": "Antonin TACCHI"
+          },
+          "about": [
+            { "@type": "Thing", "name": "FiveM MLO" },
+            { "@type": "Thing", "name": "Exterior Mapping" },
+            { "@type": "Thing", "name": "GTA V RP Server" }
+          ]
+        })}</script>
       </Helmet>
       <div className="px-6 pt-7 pb-6">
         <div className="mt-5 rounded-xl border border-white/10 bg-[#101828]/60 px-4 py-3 space-y-3">

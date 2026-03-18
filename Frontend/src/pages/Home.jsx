@@ -166,16 +166,68 @@ export default function Home() {
         <meta property="og:description" content="Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
         <meta property="og:url" content="https://antonin-tacchi.com/" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://antonin-tacchi.com/og-preview.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Antonin TACCHI — FiveM Mapping Portfolio" />
         <meta name="twitter:description" content="Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": "https://antonin-tacchi.com/#website",
+              "url": "https://antonin-tacchi.com/",
+              "name": "Antonin TACCHI — FiveM Mapping Portfolio",
+              "description": "Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers.",
+              "inLanguage": ["fr-FR", "en-US"],
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://antonin-tacchi.com/projects?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            },
+            {
+              "@type": "Person",
+              "@id": "https://antonin-tacchi.com/#person",
+              "name": "Antonin TACCHI",
+              "url": "https://antonin-tacchi.com/",
+              "jobTitle": "FiveM Mapper & Developer",
+              "description": "Professional FiveM mapper specializing in custom MLO interiors, exterior mapping, and GTA V RP server development.",
+              "knowsAbout": ["FiveM", "MLO Mapping", "GTA V", "Blender", "CodeWalker", "3D Modeling", "RP Server Development"],
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Freelance"
+              }
+            },
+            {
+              "@type": "Service",
+              "@id": "https://antonin-tacchi.com/#service-mlo",
+              "name": "Custom MLO FiveM",
+              "provider": { "@id": "https://antonin-tacchi.com/#person" },
+              "serviceType": "FiveM Mapping",
+              "description": "Creation of custom MLO interiors for FiveM GTA V RP servers. Optimized interiors with full collision and LOD.",
+              "areaServed": "Worldwide",
+              "url": "https://antonin-tacchi.com/projects?mappingType=mlo"
+            },
+            {
+              "@type": "Service",
+              "@id": "https://antonin-tacchi.com/#service-exterior",
+              "name": "Exterior Mapping FiveM",
+              "provider": { "@id": "https://antonin-tacchi.com/#person" },
+              "serviceType": "FiveM Mapping",
+              "description": "Custom exterior mapping and city rework for FiveM servers. Aerial views, districts, and open world areas.",
+              "areaServed": "Worldwide",
+              "url": "https://antonin-tacchi.com/projects?mappingType=exterior"
+            }
+          ]
+        })}</script>
       </Helmet>
 
       {/* HERO / FEATURED */}
       <section ref={heroRef} className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_40px_140px_-90px_rgba(0,0,0,0.95)]">
         <div className="relative">
           <SafeImage
-            src={featured?.image || heroImg}
+            src={heroImg}
             alt="Featured project"
             className="h-[340px] w-full"
             priority

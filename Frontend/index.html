@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/fav-icon.png" />
+    <link rel="apple-touch-icon" href="/fav-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#6b5cff" />
 
@@ -10,40 +11,88 @@
     <title>Antonin TACCHI — FiveM Mapping Portfolio</title>
     <meta name="description" content="Portfolio of Antonin TACCHI, professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
     <meta name="author" content="Antonin TACCHI" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="google-site-verification" content="i1_A7Ebr5TvVabcW0vRab6xPpDMHl4TqMdF_8OsTRWA" />
-    <meta name="keywords" content="FiveM mapper, MLO, FiveM mapping, GTA V RP, exterior mapping, custom MLO, YMAP, FiveM developer, mapping portfolio" />
+    <meta name="keywords" content="FiveM mapper, MLO FiveM, FiveM mapping commission, custom MLO, GTA V RP mapping, exterior mapping FiveM, YMAP, FiveM developer, mapping portfolio, interior FiveM, FiveM roleplay" />
 
     <!-- Open Graph defaults (overridden per-page by react-helmet-async) -->
     <meta property="og:site_name" content="Antonin TACCHI" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="fr_FR" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Antonin TACCHI — FiveM Mapping Portfolio" />
     <meta property="og:description" content="Portfolio of Antonin TACCHI, professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers." />
     <meta property="og:url" content="https://antonin-tacchi.com/" />
+    <meta property="og:image" content="https://antonin-tacchi.com/og-preview.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Twitter / X Card defaults -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Antonin TACCHI — FiveM Mapping Portfolio" />
     <meta name="twitter:description" content="Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization for GTA V RP servers." />
+    <meta name="twitter:image" content="https://antonin-tacchi.com/og-preview.png" />
 
     <!-- Canonical -->
     <link rel="canonical" href="https://antonin-tacchi.com/" />
 
-    <!-- JSON-LD Structured Data — Person + Portfolio -->
+    <!-- Preconnect to external services -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://antonin-tacchi-production.up.railway.app" />
+
+    <!-- JSON-LD Structured Data — WebSite + Person + Services -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Antonin TACCHI",
-      "url": "https://antonin-tacchi.com",
-      "jobTitle": "FiveM Mapper & Developer",
-      "description": "Professional FiveM mapper specializing in custom MLO interiors, exterior mapping, and GTA V RP server development.",
-      "knowsAbout": ["FiveM", "MLO", "GTA V Mapping", "YMAP", "3D Modeling", "RP Server Development"],
-      "offers": {
-        "@type": "Offer",
-        "description": "Custom MLO, exterior mapping, optimization, and FiveM development services",
-        "url": "https://antonin-tacchi.com/contact"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://antonin-tacchi.com/#website",
+          "url": "https://antonin-tacchi.com/",
+          "name": "Antonin TACCHI — FiveM Mapping Portfolio",
+          "description": "Professional FiveM mapper & developer. Custom MLO, exterior mapping, optimization services for GTA V RP servers.",
+          "inLanguage": ["fr-FR", "en-US"],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://antonin-tacchi.com/projects?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://antonin-tacchi.com/#person",
+          "name": "Antonin TACCHI",
+          "url": "https://antonin-tacchi.com/",
+          "jobTitle": "FiveM Mapper & Developer",
+          "description": "Professional FiveM mapper specializing in custom MLO interiors, exterior mapping, and GTA V RP server development.",
+          "knowsAbout": ["FiveM", "MLO Mapping", "GTA V Modding", "Blender", "CodeWalker", "3D Modeling", "Lua scripting", "RP Server Development"],
+          "hasOccupation": {
+            "@type": "Occupation",
+            "name": "FiveM Mapper & Developer",
+            "description": "Creates custom MLO interiors and exterior maps for FiveM GTA V roleplay servers"
+          },
+          "makesOffer": [
+            {
+              "@type": "Offer",
+              "name": "Custom MLO FiveM",
+              "description": "Custom MLO interior creation for FiveM GTA V RP servers",
+              "url": "https://antonin-tacchi.com/contact"
+            },
+            {
+              "@type": "Offer",
+              "name": "Exterior Mapping FiveM",
+              "description": "Custom exterior mapping and city rework for FiveM servers",
+              "url": "https://antonin-tacchi.com/contact"
+            },
+            {
+              "@type": "Offer",
+              "name": "FiveM Server Optimization",
+              "description": "Performance optimization and rework for FiveM servers",
+              "url": "https://antonin-tacchi.com/contact"
+            }
+          ]
+        }
+      ]
     }
     </script>
   </head>

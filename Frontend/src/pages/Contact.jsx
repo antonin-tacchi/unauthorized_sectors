@@ -175,16 +175,34 @@ export default function Contact() {
   return (
     <div className="mx-auto max-w-2xl px-6 pb-16 pt-8">
       <Helmet>
-        <title>Contact — Antonin TACCHI</title>
-        <meta name="description" content="Get in touch with Antonin TACCHI for custom FiveM mapping commissions, quotes, or any question. Respond within 24 hours." />
+        <title>Contact — Commission FiveM Mapping | Antonin TACCHI</title>
+        <meta name="description" content="Commission a custom FiveM MLO or exterior map. Get in touch with Antonin TACCHI for a quote. Fast response within 24 hours." />
         <link rel="canonical" href="https://antonin-tacchi.com/contact" />
-        <meta property="og:title" content="Contact — Antonin TACCHI" />
-        <meta property="og:description" content="Get in touch for custom FiveM mapping commissions, quotes, or any question. Respond within 24 hours." />
+        <meta property="og:title" content="Contact — Commission FiveM Mapping | Antonin TACCHI" />
+        <meta property="og:description" content="Commission a custom FiveM MLO or exterior map. Get a quote within 24 hours." />
         <meta property="og:url" content="https://antonin-tacchi.com/contact" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Contact — Antonin TACCHI" />
-        <meta name="twitter:description" content="Get in touch for custom FiveM mapping commissions or quotes. Respond within 24 hours." />
+        <meta name="twitter:title" content="Contact — Commission FiveM Mapping | Antonin TACCHI" />
+        <meta name="twitter:description" content="Commission a custom FiveM MLO or exterior map. Get a quote within 24 hours." />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "url": "https://antonin-tacchi.com/contact",
+          "name": "Contact Antonin TACCHI — FiveM Mapping Commissions",
+          "description": "Commission custom FiveM MLO interiors or exterior maps. Request a quote for your GTA V RP server.",
+          "mainEntity": {
+            "@type": "Person",
+            "@id": "https://antonin-tacchi.com/#person",
+            "name": "Antonin TACCHI",
+            "url": "https://antonin-tacchi.com/"
+          },
+          "potentialAction": {
+            "@type": "CommunicateAction",
+            "name": "Request a FiveM mapping commission",
+            "target": "https://antonin-tacchi.com/contact"
+          }
+        })}</script>
       </Helmet>
       <h1 className="text-5xl font-extrabold tracking-tight text-white/90">{t("contact.title")}</h1>
       <p className="mt-2 text-white/50">{t("contact.subtitle")}</p>
