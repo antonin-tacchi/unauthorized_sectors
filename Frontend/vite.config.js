@@ -1,9 +1,29 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Plugin: inject <link rel="preload"> for the LCP hero image after build
+function preloadHeroPlugin() {
+  let heroAssetUrl = null
+  return {
+    name: 'preload-hero',
+    generateBundle(_, bundle) {
+      for (const [fileName] of Object.entries(bundle)) {
+        if (fileName.includes('HeroPortfolio') && fileName.endsWith('.webp')) {
+          heroAssetUrl = `/${fileName}`
+        }
+      }
+    },
+    transformIndexHtml(html) {
+      if (!heroAssetUrl) return html
+      const tag = `  <link rel="preload" as="image" href="${heroAssetUrl}" type="image/webp" fetchpriority="high">\n`
+      return html.replace('</head>', `${tag}</head>`)
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), preloadHeroPlugin()],
   server: {
     host: true,
     port: 5173,

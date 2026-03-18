@@ -10,6 +10,7 @@ export default function SafeImage({
   imgClassName = "",
   fallbackSrc = PLACEHOLDER,
   style,
+  priority = false,
   loading: _loading,
   ...props
 }) {
@@ -41,7 +42,8 @@ export default function SafeImage({
         ref={imgRef}
         src={imgSrc}
         alt={alt}
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
+        fetchpriority={priority ? "high" : undefined}
         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
           loaded ? "opacity-100" : "opacity-0"
         } ${imgClassName}`}

@@ -27,7 +27,12 @@
       "Bash(cmd.exe /c \"where node 2>&1 & node --version 2>&1\")",
       "Bash(powershell.exe -Command \"node --version; npm --version; \\(Get-Command node -ErrorAction SilentlyContinue\\).Source\")",
       "Bash(find /c/Users/nenin/Documents/.Perso/unauthorized_sectors -maxdepth 2 -type f \\\\\\(-name package.json -o -name docker-compose* -o -name Dockerfile* -o -name .env* \\\\\\))",
-      "Bash(timeout 6 node src/server.js)"
+      "Bash(timeout 6 node src/server.js)",
+      "Bash(grep -rn \"sitemap\\\\|robots\\\\|meta\\\\|og:\\\\|canonical\\\\|google\" c:UsersneninDocuments.Persounauthorized_sectors.claudeworktreesnice-coriFrontendsrc --include=*.jsx --include=*.tsx --include=*.html -l)",
+      "Bash(curl -I https://antonin-tacchi.com/sitemap.xml)",
+      "mcp__chrome-devtools__lighthouse_audit",
+      "mcp__chrome-devtools__performance_start_trace",
+      "mcp__chrome-devtools__performance_analyze_insight"
     ]
   }
 }

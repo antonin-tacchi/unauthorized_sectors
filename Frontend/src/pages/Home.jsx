@@ -178,6 +178,7 @@ export default function Home() {
             src={featured?.image || heroImg}
             alt="Featured project"
             className="h-[340px] w-full"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
           <div className="absolute left-6 top-6">
