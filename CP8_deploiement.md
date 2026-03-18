@@ -1,8 +1,3 @@
-# CP8 — Élaboration et mise en œuvre du déploiement
-## Portfolio FiveM — Antonin TACCHI
-
----
-
 ## 1. Présentation du projet
 
 **Nom du projet :** Portfolio FiveM — Antonin TACCHI
