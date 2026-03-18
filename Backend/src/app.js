@@ -34,8 +34,8 @@ app.use(cookieParser());
 
 // Cache-Control middleware
 app.use("/api", (req, res, next) => {
-  // Routes tickets (admin, données temps-réel) : jamais de cache
-  if (req.path.startsWith("/tickets")) {
+  // Routes tickets + settings (données temps-réel) : jamais de cache
+  if (req.path.startsWith("/tickets") || req.path.startsWith("/settings")) {
     res.set("Cache-Control", "no-store");
   } else if (req.method === "GET") {
     // Données publiques : 60s cache, revalidation en arrière-plan
