@@ -7,7 +7,11 @@ import { initMySQL } from "./db/mysql.js";
 validateEnv();
 
 await connectDB();
-await initMySQL();
+try {
+  await initMySQL();
+} catch (err) {
+  console.warn("⚠ MySQL init skipped:", err.message);
+}
 
 const PORT = process.env.PORT || 5000;
 
