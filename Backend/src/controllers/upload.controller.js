@@ -86,7 +86,7 @@ export async function uploadModel(req, res) {
 
     const key = `models/${randomUUID()}${ext}`;
     await s3.send(new PutObjectCommand({
-      Bucket:      process.env.R2_BUCKET,
+      Bucket:      process.env.R2_BUCKET_NAME,
       Key:         key,
       Body:        body,
       ContentType: contentType,
