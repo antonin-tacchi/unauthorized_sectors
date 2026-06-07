@@ -1,11 +1,19 @@
 import mysql from "mysql2/promise";
 
+// Railway injecte MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE automatiquement
+// On les lit en priorité, avec fallback sur les variables MYSQL_* manuelles
+const DB_HOST     = process.env.MYSQLHOST     || process.env.MYSQL_HOST     || "localhost";
+const DB_PORT     = Number(process.env.MYSQLPORT || process.env.MYSQL_PORT) || 3306;
+const DB_USER     = process.env.MYSQLUSER     || process.env.MYSQL_USER     || "root";
+const DB_PASSWORD = process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || "";
+const DB_NAME     = process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || "tickets_db";
+
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || "localhost",
-  port: Number(process.env.MYSQL_PORT) || 3306,
-  user: process.env.MYSQL_USER || "tickets_user",
-  password: process.env.MYSQL_PASSWORD || "tickets_pass",
-  database: process.env.MYSQL_DATABASE || "tickets_db",
+  host: DB_HOST,
+  port: DB_PORT,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   charset: "utf8mb4",
@@ -13,16 +21,16 @@ const pool = mysql.createPool({
 
 export async function initMySQL() {
   const conn = await mysql.createConnection({
-    host: process.env.MYSQL_HOST || "localhost",
-    port: Number(process.env.MYSQL_PORT) || 3306,
-    user: process.env.MYSQL_USER || "tickets_user",
-    password: process.env.MYSQL_PASSWORD || "tickets_pass",
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
   });
   try {
     await conn.query(
-      `CREATE DATABASE IF NOT EXISTS \`${process.env.MYSQL_DATABASE || "tickets_db"}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
-    await conn.query(`USE \`${process.env.MYSQL_DATABASE || "tickets_db"}\``);
+    await conn.query(`USE \`${DB_NAME}\``);
     await conn.query(`
       CREATE TABLE IF NOT EXISTS tickets (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
