@@ -70,8 +70,33 @@ services:
       "
     restart: "no"
 
+  mysql:
+    image: mysql:8.4
+    container_name: portfolio_mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/mysql-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - portfolio_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
 volumes:
   mongo_data:
+  mysql_data:
   node_modules_cache:
 
 networks:
