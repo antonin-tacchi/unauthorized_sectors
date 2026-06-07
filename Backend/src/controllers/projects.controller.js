@@ -159,6 +159,32 @@ export async function getProjectStats(req, res) {
   }
 }
 
+/* ---------------- STATS ---------------- */
+
+export async function getProjectStats(req, res) {
+  try {
+    const baseFilter = { type: "mapping", status: "published" };
+
+    const [total, byMappingType] = await Promise.all([
+      Project.countDocuments(baseFilter),
+      Project.aggregate([
+        { $match: baseFilter },
+        { $group: { _id: "$mappingType", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
+    ]);
+
+    return res.json({
+      total,
+      byMappingType: Object.fromEntries(
+        byMappingType.map(({ _id, count }) => [_id ?? "unknown", count])
+      ),
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+}
+
 /* ---------------- GET BY SLUG ---------------- */
 
 export async function getProjectBySlug(req, res) {
@@ -174,6 +200,7 @@ export async function getProjectBySlug(req, res) {
 
     const media = await ProjectMedia.find({ projectId: project._id })
       .sort({ sortOrder: 1, createdAt: 1 })
+      .select({ url: 1, alt: 1, mediaType: 1, provider: 1, isCover: 1, sortOrder: 1, role: 1 })
       .select({ url: 1, alt: 1, mediaType: 1, provider: 1, isCover: 1, sortOrder: 1, role: 1 })
       .lean();
 

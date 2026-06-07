@@ -1,4 +1,10 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
+
+import { AuthProvider } from "./context/AuthContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
+import { SettingsProvider } from "./context/SettingsContext";
+import AdminRoute from "./routes/AdminRoute";
 
 import Layout from "./layout/Layout";
 import Home from "./pages/Home";
@@ -10,19 +16,65 @@ import LegalNotices from "./pages/LegalNotices";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 
+// Admin — chargés uniquement quand on accède à /admin
+const AdminLogin      = lazy(() => import("./pages/admin/Login"));
+const AdminLayout     = lazy(() => import("./layout/AdminLayout"));
+const Dashboard       = lazy(() => import("./pages/admin/Dashboard"));
+const AdminProjects   = lazy(() => import("./pages/admin/AdminProjects"));
+const AdminProjectForm = lazy(() => import("./pages/admin/AdminProjectForm"));
+const AdminFilters    = lazy(() => import("./pages/admin/AdminFilters"));
+const AdminTags       = lazy(() => import("./pages/admin/AdminTags"));
+const AdminSettings   = lazy(() => import("./pages/admin/AdminSettings"));
+
+function AdminFallback() {
+  return (
+    <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center">
+      <div className="w-6 h-6 rounded-full border-2 border-[#6b5cff] border-t-transparent animate-spin" />
+    </div>
+  );
+}
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/:slug" element={<ProjectDetails />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="legal-notices" element={<LegalNotices />} />
-        <Route path="privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="terms-of-service" element={<TermsOfService />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <SettingsProvider>
+      <FavoritesProvider>
+      <Routes>
+        {/* Public site */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="projects/:slug" element={<ProjectDetails />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="legal-notices" element={<LegalNotices />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="terms-of-service" element={<TermsOfService />} />
+        </Route>
+
+        {/* Admin */}
+        <Route path="/admin/login" element={<Suspense fallback={<AdminFallback />}><AdminLogin /></Suspense>} />
+        <Route
+          path="/admin"
+          element={
+            <Suspense fallback={<AdminFallback />}>
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            </Suspense>
+          }
+        >
+          <Route index element={<Suspense fallback={null}><Dashboard /></Suspense>} />
+          <Route path="projects" element={<Suspense fallback={null}><AdminProjects /></Suspense>} />
+          <Route path="projects/new" element={<Suspense fallback={null}><AdminProjectForm /></Suspense>} />
+          <Route path="projects/:id/edit" element={<Suspense fallback={null}><AdminProjectForm /></Suspense>} />
+          <Route path="filters" element={<Suspense fallback={null}><AdminFilters /></Suspense>} />
+          <Route path="tags" element={<Suspense fallback={null}><AdminTags /></Suspense>} />
+          <Route path="settings" element={<Suspense fallback={null}><AdminSettings /></Suspense>} />
+        </Route>
+      </Routes>
+      </FavoritesProvider>
+      </SettingsProvider>
+    </AuthProvider>
   );
 }
