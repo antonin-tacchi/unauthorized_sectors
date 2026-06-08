@@ -14,7 +14,8 @@ export async function createTicket(req, res) {
   try {
     ticket = await Ticket.create({ email, discord, subject, budget, timeline, message });
   } catch (err) {
-    return res.status(400).json({ message: "Erreur lors de la création du ticket." });
+    console.error("createTicket error:", err.message, err.code);
+    return res.status(500).json({ message: "Erreur lors de la création du ticket.", detail: err.message });
   }
 
   // Fire-and-forget Discord notifications
