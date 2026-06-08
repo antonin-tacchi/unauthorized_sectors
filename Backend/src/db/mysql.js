@@ -62,17 +62,19 @@ export async function initMySQL() {
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
-    // Idempotent migrations for existing tables
+    // Idempotent migrations — ignore ER_DUP_FIELDNAME (column already exists)
     const alterations = [
-      "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS budget VARCHAR(100) NOT NULL DEFAULT ''",
-      "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS timeline VARCHAR(100) NOT NULL DEFAULT ''",
-      "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS project_ref VARCHAR(255) NOT NULL DEFAULT ''",
-      "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS discord_thread_id VARCHAR(30) NOT NULL DEFAULT ''",
-      "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS discord_channel_id VARCHAR(30) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets ADD COLUMN budget VARCHAR(100) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets ADD COLUMN timeline VARCHAR(100) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets ADD COLUMN project_ref VARCHAR(255) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets ADD COLUMN discord_thread_id VARCHAR(30) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets ADD COLUMN discord_channel_id VARCHAR(30) NOT NULL DEFAULT ''",
       "ALTER TABLE tickets MODIFY COLUMN subject ENUM('Custom MLO','Exterior Mapping','Optimization','Bug Report','Other','Existing Project') NOT NULL",
     ];
     for (const sql of alterations) {
-      await conn.query(sql).catch(() => {});
+      await conn.query(sql).catch((e) => {
+        if (e.code !== "ER_DUP_FIELDNAME") console.warn("Migration warning:", e.message);
+      });
     }
     console.log("✅ MySQL initialized");
   } finally {
