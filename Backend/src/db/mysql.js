@@ -46,10 +46,11 @@ export async function initMySQL() {
         ticket_number VARCHAR(10) NOT NULL UNIQUE,
         email VARCHAR(255) NOT NULL,
         discord VARCHAR(100) NOT NULL DEFAULT '',
-        subject ENUM('Custom MLO','Exterior Mapping','Optimization','Bug Report','Other') NOT NULL,
+        subject ENUM('Custom MLO','Exterior Mapping','Optimization','Bug Report','Other','Existing Project') NOT NULL,
         priority ENUM('low','medium','high') NOT NULL DEFAULT 'low',
         budget VARCHAR(100) NOT NULL DEFAULT '',
         timeline VARCHAR(100) NOT NULL DEFAULT '',
+        project_ref VARCHAR(255) NOT NULL DEFAULT '',
         message TEXT NOT NULL,
         status ENUM('open','in-progress','resolved','closed') NOT NULL DEFAULT 'open',
         discord_message_id VARCHAR(30) NOT NULL DEFAULT '',
@@ -65,8 +66,10 @@ export async function initMySQL() {
     const alterations = [
       "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS budget VARCHAR(100) NOT NULL DEFAULT ''",
       "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS timeline VARCHAR(100) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS project_ref VARCHAR(255) NOT NULL DEFAULT ''",
       "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS discord_thread_id VARCHAR(30) NOT NULL DEFAULT ''",
       "ALTER TABLE tickets ADD COLUMN IF NOT EXISTS discord_channel_id VARCHAR(30) NOT NULL DEFAULT ''",
+      "ALTER TABLE tickets MODIFY COLUMN subject ENUM('Custom MLO','Exterior Mapping','Optimization','Bug Report','Other','Existing Project') NOT NULL",
     ];
     for (const sql of alterations) {
       await conn.query(sql).catch(() => {});

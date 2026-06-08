@@ -4,7 +4,7 @@ import { createTicketChannel, archiveTicketChannel, deleteTicketChannel } from "
 
 // POST /api/tickets  (public)
 export async function createTicket(req, res) {
-  const { email, discord, subject, budget, timeline, message } = req.body;
+  const { email, discord, subject, budget, timeline, projectRef, message } = req.body;
 
   if (!email || !subject || !message) {
     return res.status(400).json({ message: "email, subject, and message are required." });
@@ -12,7 +12,7 @@ export async function createTicket(req, res) {
 
   let ticket;
   try {
-    ticket = await Ticket.create({ email, discord, subject, budget, timeline, message });
+    ticket = await Ticket.create({ email, discord, subject, budget, timeline, projectRef, message });
   } catch (err) {
     console.error("createTicket error:", err.message, err.code);
     return res.status(500).json({ message: "Erreur lors de la création du ticket.", detail: err.message });

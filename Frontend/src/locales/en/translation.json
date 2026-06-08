@@ -93,7 +93,9 @@
       "bugReport": "Bug Report",
       "complaint": "Complaint",
       "generalQuestion": "General question",
-      "other": "Other"
+      "other": "Other",
+      "existingProjectGroup": "— Existing Project —",
+      "existingProject": "Information / Purchase on existing project"
     },
     "budgets": {
       "under20": "< 20 €",
@@ -114,7 +116,9 @@
       "emailRequired": "Valid email required.",
       "subjectRequired": "Please select a subject.",
       "messageRequired": "Message is required."
-    }
+    },
+    "projectLabel": "Related project",
+    "projectPlaceholder": "Select a project…"
   },
   "projects": {
     "title": "Projects",

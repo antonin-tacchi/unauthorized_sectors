@@ -23,6 +23,7 @@ function toTicket(row) {
     priority: row.priority,
     budget: row.budget,
     timeline: row.timeline,
+    projectRef: row.project_ref,
     message: row.message,
     status: row.status,
     discordMessageId: row.discord_message_id,
@@ -35,15 +36,15 @@ function toTicket(row) {
   };
 }
 
-export async function create({ email, discord = "", subject, priority = "low", budget = "", timeline = "", message }) {
+export async function create({ email, discord = "", subject, priority = "low", budget = "", timeline = "", projectRef = "", message }) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
     const ticketNumber = await nextTicketNumber(conn);
     await conn.query(
-      `INSERT INTO tickets (ticket_number, email, discord, subject, priority, budget, timeline, message)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [ticketNumber, email.trim().toLowerCase(), discord.trim(), subject, priority, budget.trim(), timeline.trim(), message.trim()]
+      `INSERT INTO tickets (ticket_number, email, discord, subject, priority, budget, timeline, project_ref, message)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [ticketNumber, email.trim().toLowerCase(), discord.trim(), subject, priority, budget.trim(), timeline.trim(), projectRef.trim(), message.trim()]
     );
     const [[row]] = await conn.query(
       "SELECT * FROM tickets WHERE ticket_number = ?",

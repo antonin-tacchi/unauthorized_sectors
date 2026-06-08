@@ -93,7 +93,9 @@
       "bugReport": "Bug Report",
       "complaint": "Réclamation",
       "generalQuestion": "Question générale",
-      "other": "Autre"
+      "other": "Autre",
+      "existingProjectGroup": "— Projet existant —",
+      "existingProject": "Informations / Achat sur projet existant"
     },
     "budgets": {
       "under20": "< 20 €",
@@ -114,7 +116,9 @@
       "emailRequired": "Email valide requis.",
       "subjectRequired": "Veuillez sélectionner un sujet.",
       "messageRequired": "Le message est requis."
-    }
+    },
+    "projectLabel": "Projet concerné",
+    "projectPlaceholder": "Sélectionner un projet…"
   },
   "projects": {
     "title": "Projets",
@@ -129,7 +133,7 @@
     "projectCount_one": "{{count}} projet",
     "projectCount_other": "{{count}} projets",
     "noResults": "Aucun projet trouvé",
-    "noResultsQuery": "Aucun résultat pour «\u00a0{{query}}\u00a0»",
+    "noResultsQuery": "Aucun résultat pour « {{query}} »",
     "clearFilters": "Effacer les filtres",
     "prev": "Préc.",
     "next": "Suiv.",

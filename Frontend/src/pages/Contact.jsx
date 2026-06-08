@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,7 @@ function buildDiscordOAuthUrl(ticketNumber) {
 }
 
 const COMMISSION_SUBJECTS = ["Custom MLO", "Exterior Mapping", "Optimization"];
+const EXISTING_PROJECT_SUBJECT = "Existing Project";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,6 +52,8 @@ export default function Contact() {
     { label: t("contact.subjects.complaint"), value: "Other" },
     { label: t("contact.subjects.generalQuestion"), value: "Other" },
     { label: t("contact.subjects.other"), value: "Other" },
+    { label: t("contact.subjects.existingProjectGroup"), disabled: true },
+    { label: t("contact.subjects.existingProject"), value: EXISTING_PROJECT_SUBJECT },
   ];
 
   const BUDGETS = [
@@ -76,12 +79,21 @@ export default function Contact() {
     subject: "",
     budget: "",
     timeline: "",
+    projectRef: "",
     message: "",
   });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
   const [serverError, setServerError] = useState("");
   const [ticketNumber, setTicketNumber] = useState("");
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/projects?limit=100`)
+      .then((r) => r.json())
+      .then((data) => setProjects(Array.isArray(data.projects) ? data.projects : []))
+      .catch(() => {});
+  }, []);
 
   function validate() {
     const e = {};
@@ -115,6 +127,7 @@ export default function Contact() {
           subject: form.subject,
           budget: form.budget || undefined,
           timeline: form.timeline || undefined,
+          projectRef: form.projectRef || undefined,
           message: form.message.trim(),
         }),
       });
@@ -160,7 +173,7 @@ export default function Contact() {
         <br />
         <button
           onClick={() => {
-            setForm({ email: "", discord: "", subject: "", budget: "", timeline: "", message: "" });
+            setForm({ email: "", discord: "", subject: "", budget: "", timeline: "", projectRef: "", message: "" });
             setTicketNumber("");
             setStatus("idle");
           }}
@@ -250,6 +263,22 @@ export default function Contact() {
           </select>
           {errors.subject && <p className="mt-1 text-xs text-red-400">{errors.subject}</p>}
         </Field>
+
+        {form.subject === EXISTING_PROJECT_SUBJECT && (
+          <Field label={t("contact.projectLabel")} optional={t("contact.optional")}>
+            <select
+              name="projectRef"
+              value={form.projectRef}
+              onChange={handleChange}
+              className={inputClass + " appearance-none cursor-pointer"}
+            >
+              <option value="" className="bg-[#0f1117]">{t("contact.projectPlaceholder")}</option>
+              {projects.map((p) => (
+                <option key={p._id || p.slug} value={p.title} className="bg-[#0f1117]">{p.title}</option>
+              ))}
+            </select>
+          </Field>
+        )}
 
         {COMMISSION_SUBJECTS.includes(form.subject) && (
           <div className="grid grid-cols-2 gap-4">
