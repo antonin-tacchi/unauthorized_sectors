@@ -1,16 +1,17 @@
 import mysql from "mysql2/promise";
 
-// Support MYSQL_URL (ex: mysql://user:pass@host:3306/db) ou variables séparées
 function getConfig() {
   const url = process.env.MYSQL_URL || process.env.MYSQL_PRIVATE_URL;
   if (url) {
     const u = new URL(url);
+    const requireSsl = u.searchParams.get("ssl-mode") === "REQUIRED" || u.hostname.includes("aivencloud");
     return {
       host:     u.hostname,
       port:     Number(u.port) || 3306,
-      user:     u.username,
-      password: u.password,
-      database: u.pathname.slice(1),
+      user:     decodeURIComponent(u.username),
+      password: decodeURIComponent(u.password),
+      database: u.pathname.slice(1).split("?")[0],
+      ...(requireSsl ? { ssl: { rejectUnauthorized: false } } : {}),
     };
   }
   return {
