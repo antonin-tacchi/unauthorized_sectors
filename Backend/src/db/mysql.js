@@ -1,36 +1,44 @@
 import mysql from "mysql2/promise";
 
-// Railway injecte MYSQLHOST/MYSQLUSER/MYSQLPASSWORD/MYSQLDATABASE automatiquement
-// On les lit en priorité, avec fallback sur les variables MYSQL_* manuelles
-const DB_HOST     = process.env.MYSQLHOST     || process.env.MYSQL_HOST     || "localhost";
-const DB_PORT     = Number(process.env.MYSQLPORT || process.env.MYSQL_PORT) || 3306;
-const DB_USER     = process.env.MYSQLUSER     || process.env.MYSQL_USER     || "root";
-const DB_PASSWORD = process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || "";
-const DB_NAME     = process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || "tickets_db";
+// Support MYSQL_URL (ex: mysql://user:pass@host:3306/db) ou variables séparées
+function getConfig() {
+  const url = process.env.MYSQL_URL || process.env.MYSQL_PRIVATE_URL;
+  if (url) {
+    const u = new URL(url);
+    return {
+      host:     u.hostname,
+      port:     Number(u.port) || 3306,
+      user:     u.username,
+      password: u.password,
+      database: u.pathname.slice(1),
+    };
+  }
+  return {
+    host:     process.env.MYSQLHOST     || process.env.MYSQL_HOST     || "localhost",
+    port:     Number(process.env.MYSQLPORT || process.env.MYSQL_PORT) || 3306,
+    user:     process.env.MYSQLUSER     || process.env.MYSQL_USER     || "root",
+    password: process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || "",
+    database: process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || "tickets_db",
+  };
+}
+
+const cfg = getConfig();
 
 const pool = mysql.createPool({
-  host: DB_HOST,
-  port: DB_PORT,
-  user: DB_USER,
-  password: DB_PASSWORD,
-  database: DB_NAME,
+  ...cfg,
   waitForConnections: true,
   connectionLimit: 10,
   charset: "utf8mb4",
 });
 
 export async function initMySQL() {
-  const conn = await mysql.createConnection({
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PASSWORD,
-  });
+  const { database, ...connCfg } = cfg;
+  const conn = await mysql.createConnection({ ...connCfg, database: undefined });
   try {
     await conn.query(
-      `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      `CREATE DATABASE IF NOT EXISTS \`${cfg.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
-    await conn.query(`USE \`${DB_NAME}\``);
+    await conn.query(`USE \`${cfg.database}\``);
     await conn.query(`
       CREATE TABLE IF NOT EXISTS tickets (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
