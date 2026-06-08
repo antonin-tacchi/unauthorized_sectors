@@ -55,7 +55,7 @@ export async function initMySQL() {
         discord_message_id VARCHAR(30) NOT NULL DEFAULT '',
         discord_thread_id VARCHAR(30) NOT NULL DEFAULT '',
         discord_channel_id VARCHAR(30) NOT NULL DEFAULT '',
-        admin_notes TEXT NOT NULL DEFAULT '',
+        admin_notes TEXT,
         resolved_at DATETIME DEFAULT NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
