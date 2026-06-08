@@ -2,6 +2,7 @@ import "dotenv/config";
 import { validateEnv } from "./config/validateEnv.js";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
+import { initMySQL } from "./db/mysql.js";
 import { startBot } from "./services/discord.bot.js";
 import bcrypt from "bcryptjs";
 import Admin from "./models/Admin.js";
@@ -9,6 +10,11 @@ import Admin from "./models/Admin.js";
 validateEnv();
 
 await connectDB();
+try {
+  await initMySQL();
+} catch (err) {
+  console.warn("⚠ MySQL init skipped:", err.message);
+}
 startBot();
 
 // Auto-create admin from env vars if not exists
