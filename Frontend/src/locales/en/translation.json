@@ -81,8 +81,8 @@
     "submitting": "Sending…",
     "successTitle": "Message sent!",
     "successText": "Your request has been received. I will reply as soon as possible by email.",
-    "discordJoinText": "Join the Discord server to track your ticket and communicate directly.",
-    "discordConnect": "Connect with Discord & join the server",
+    "discordJoinText": "Access your private conversation to follow and discuss your ticket directly with me.",
+    "discordConnect": "Join the ticket conversation",
     "sendAnother": "Send another message",
     "subjects": {
       "commissionGroup": "— Commission —",

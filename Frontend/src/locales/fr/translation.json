@@ -81,8 +81,8 @@
     "submitting": "Envoi en cours…",
     "successTitle": "Message envoyé !",
     "successText": "Ta demande a bien été reçue. Je te répondrai dans les plus brefs délais par email.",
-    "discordJoinText": "Rejoins le serveur Discord pour suivre ton ticket et communiquer directement.",
-    "discordConnect": "Rejoindre le Discord",
+    "discordJoinText": "Accède à ta conversation privée pour suivre et discuter de ton ticket directement avec moi.",
+    "discordConnect": "Rejoindre la conversation du ticket",
     "sendAnother": "Envoyer un autre message",
     "subjects": {
       "commissionGroup": "— Commission —",
