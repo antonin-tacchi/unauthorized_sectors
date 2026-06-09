@@ -403,6 +403,24 @@ export default function AdminProjectForm() {
   const [categories,  setCategories]  = useState(isEdit ? [] : DEFAULT_CATEGORIES);
   const [faq,         setFaq]         = useState(isEdit ? [] : DEFAULT_FAQ);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [lots,        setLots]        = useState([]); // secondary lots
+  const [expandedLot, setExpandedLot] = useState(null); // index of expanded lot
+
+  function emptyLot() {
+    return { label: "", shortDesc: "", description: "", "pricing.cents": "", image: "", overview: [], features: [], modelUrl: "", status: "published" };
+  }
+  function updateLot(idx, key, val) {
+    setLots(prev => prev.map((l, i) => i === idx ? { ...l, [key]: val } : l));
+  }
+  function addLotItem(idx, field, val) {
+    setLots(prev => prev.map((l, i) => i === idx ? { ...l, [field]: [...(l[field] || []), val] } : l));
+  }
+  function removeLotItem(idx, field, itemIdx) {
+    setLots(prev => prev.map((l, i) => i === idx ? { ...l, [field]: l[field].filter((_, j) => j !== itemIdx) } : l));
+  }
+  function updateLotItem(idx, field, itemIdx, val) {
+    setLots(prev => prev.map((l, i) => i === idx ? { ...l, [field]: l[field].map((v, j) => j === itemIdx ? val : v) } : l));
+  }
 
   // Dynamic filters + existing tags
   const [filterOptions, setFilterOptions] = useState({ mappingTypes: [], styles: [], sizes: [], performances: [] });
@@ -441,6 +459,12 @@ export default function AdminProjectForm() {
         setFrameworks(d.technical?.frameworks || []);
         setCategories(d.technical?.categories || []);
         setFaq(d.technical?.faq || []);
+        setLots((d.lots || []).map(l => ({
+          label: l.label || "", shortDesc: l.shortDesc || "", description: l.description || "",
+          "pricing.cents": l.pricing?.cents ? String(l.pricing.cents) : "",
+          image: l.image || "", overview: l.overview || [], features: l.features || [],
+          modelUrl: l.modelUrl || "", status: l.status || "published",
+        })));
         if (rm.ok) {
           const md = await rm.json();
           setMediaRows(md.map((m) => ({ _id: m._id, url: m.url, mediaType: m.mediaType || "image", role: m.role || "gallery" })));
@@ -497,6 +521,17 @@ export default function AdminProjectForm() {
         categories: categories.filter(Boolean),
         faq: faq.filter((f) => f.question || f.answer),
       },
+      lots: lots.filter(l => l.label).map(l => ({
+        label: l.label,
+        shortDesc: l.shortDesc || "",
+        description: l.description || "",
+        pricing: { cents: parseInt(l["pricing.cents"] || "0", 10) || 0 },
+        image: l.image || "",
+        overview: (l.overview || []).filter(Boolean),
+        features: (l.features || []).filter(Boolean),
+        modelUrl: l.modelUrl || "",
+        status: l.status || "published",
+      })),
     };
     try {
       const res = await fetch(
@@ -713,6 +748,151 @@ export default function AdminProjectForm() {
                     ✕
                   </button>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Lots secondaires ─────────────────────────────────── */}
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-widest text-white/35">Lots secondaires</span>
+              <p className="text-xs text-white/30 mt-0.5">Variantes / versions (partagent la stack technique du lot principal)</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => { setLots(prev => [...prev, emptyLot()]); setExpandedLot(lots.length); }}
+              className="rounded-lg border border-[#6b5cff]/40 bg-[#6b5cff]/10 px-3 py-1.5 text-xs text-[#a89fff] hover:bg-[#6b5cff]/20 transition"
+            >
+              + Ajouter un lot
+            </button>
+          </div>
+
+          {lots.length === 0 && (
+            <p className="text-sm text-white/30 py-2">Aucun lot secondaire. Clique sur "+ Ajouter un lot" pour en créer.</p>
+          )}
+
+          <div className="space-y-2">
+            {lots.map((lot, idx) => (
+              <div key={idx} className="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center gap-3 px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedLot(expandedLot === idx ? null : idx)}
+                    className="flex-1 flex items-center gap-2 text-left"
+                  >
+                    <svg className={`w-3.5 h-3.5 text-white/40 transition-transform ${expandedLot === idx ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="text-sm font-medium text-white/80">{lot.label || <span className="italic text-white/30">Lot sans nom</span>}</span>
+                    {lot.status === "draft" && <span className="rounded-full bg-yellow-500/15 px-2 py-0.5 text-xs text-yellow-400">draft</span>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLots(prev => prev.filter((_, i) => i !== idx))}
+                    className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 transition"
+                  >✕</button>
+                </div>
+
+                {/* Body */}
+                {expandedLot === idx && (
+                  <div className="border-t border-white/10 px-3 py-3 space-y-3">
+                    {/* Label + status */}
+                    <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                      <div>
+                        <label className="block text-xs text-white/50 mb-1">Nom du lot *</label>
+                        <input
+                          value={lot.label}
+                          onChange={e => updateLot(idx, "label", e.target.value)}
+                          placeholder="ex: Module Police seul"
+                          className={inputCls}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-white/50 mb-1">Statut</label>
+                        <select value={lot.status} onChange={e => updateLot(idx, "status", e.target.value)} className={selectSmCls}>
+                          <option value="published">Publié</option>
+                          <option value="draft">Brouillon</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Prix */}
+                    <div>
+                      <label className="block text-xs text-white/50 mb-1">Prix (centimes EUR)</label>
+                      <input
+                        type="number" min="0"
+                        value={lot["pricing.cents"]}
+                        onChange={e => updateLot(idx, "pricing.cents", e.target.value)}
+                        placeholder="ex: 2500 = 25 €"
+                        className={inputCls}
+                      />
+                    </div>
+
+                    {/* Short desc */}
+                    <div>
+                      <label className="block text-xs text-white/50 mb-1">Description courte</label>
+                      <input
+                        value={lot.shortDesc}
+                        onChange={e => updateLot(idx, "shortDesc", e.target.value)}
+                        maxLength={300}
+                        className={inputCls}
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="block text-xs text-white/50 mb-1">Description longue</label>
+                      <textarea
+                        rows={3}
+                        value={lot.description}
+                        onChange={e => updateLot(idx, "description", e.target.value)}
+                        className={inputCls + " resize-none"}
+                      />
+                    </div>
+
+                    {/* Image URL */}
+                    <div>
+                      <label className="block text-xs text-white/50 mb-1">Image cover (URL)</label>
+                      <input
+                        value={lot.image}
+                        onChange={e => updateLot(idx, "image", e.target.value)}
+                        placeholder="https://..."
+                        className={inputCls}
+                      />
+                    </div>
+
+                    {/* Overview */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-white/50">Overview</label>
+                        <button type="button" onClick={() => addLotItem(idx, "overview", "")} className="text-xs text-[#a89fff] hover:text-white transition">+ Add</button>
+                      </div>
+                      {(lot.overview || []).map((item, ii) => (
+                        <div key={ii} className="flex gap-2 mb-1.5">
+                          <input value={item} onChange={e => updateLotItem(idx, "overview", ii, e.target.value)} className={inputCls} />
+                          <button type="button" onClick={() => removeLotItem(idx, "overview", ii)} className="text-red-400 hover:text-red-300 text-xs px-2">✕</button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Features */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-white/50">Features</label>
+                        <button type="button" onClick={() => addLotItem(idx, "features", "")} className="text-xs text-[#a89fff] hover:text-white transition">+ Add</button>
+                      </div>
+                      {(lot.features || []).map((item, ii) => (
+                        <div key={ii} className="flex gap-2 mb-1.5">
+                          <input value={item} onChange={e => updateLotItem(idx, "features", ii, e.target.value)} className={inputCls} />
+                          <button type="button" onClick={() => removeLotItem(idx, "features", ii)} className="text-red-400 hover:text-red-300 text-xs px-2">✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

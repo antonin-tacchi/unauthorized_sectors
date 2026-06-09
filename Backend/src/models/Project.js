@@ -52,6 +52,25 @@ const projectSchema = new mongoose.Schema(
     stats: {
       favorites: { type: Number, default: 0 },
     },
+
+    // Secondary lots (variants) — main project fields are "lot principal"
+    // Shared across all lots: technical, tags, mappingType, style, size, performance
+    lots: [
+      {
+        label:       { type: String, required: true, trim: true }, // e.g. "Module Police seul"
+        shortDesc:   { type: String, default: "" },
+        description: { type: String, default: "" },
+        pricing: {
+          cents:    { type: Number, default: 0 },
+          currency: { type: String, default: "EUR" },
+        },
+        image:    { type: String, default: "" },
+        overview: [{ type: String }],
+        features: [{ type: String }],
+        modelUrl: { type: String, default: "" },
+        status:   { type: String, default: "published" }, // published|draft
+      },
+    ],
   },
   { timestamps: true }
 );

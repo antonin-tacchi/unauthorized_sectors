@@ -37,18 +37,19 @@ export default function ProjectDetails() {
   // Unified gallery items: images + videos + optional 3D slot
   // Each item: { type: "image"|"video"|"3d", url, role }
   const galleryItems = useMemo(() => {
-    if (!project) return [];
-    const cover = project.image ? [{ type: "image", url: project.image, role: "cover" }] : [];
-    const fromMedia = Array.isArray(project.media)
+    if (!project || !activeLot) return [];
+    // For secondary lots, use lot image only (no shared media array)
+    const cover = activeLot.image ? [{ type: "image", url: activeLot.image, role: "cover" }] : [];
+    const fromMedia = selectedLotIdx === null && Array.isArray(project.media)
       ? project.media
           .filter((m) => m?.url && (m.mediaType === "image" || m.mediaType === "video"))
           .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
           .map((m) => ({ type: m.mediaType === "video" ? "video" : "image", url: m.url, role: m.role || "gallery" }))
       : [];
-    const model3d = project.modelUrl ? [{ type: "3d", url: project.modelUrl, role: "3d" }] : [];
+    const model3d = activeLot.modelUrl ? [{ type: "3d", url: activeLot.modelUrl, role: "3d" }] : [];
     const all = [...cover, ...fromMedia, ...model3d];
     return all.length ? all : [{ type: "image", url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%23101828'/%3E%3Cpath d='M6 3.5L10 4.5 8 6z' fill='%23ffffff18'/%3E%3Ccircle cx='10' cy='3' r='1' fill='%23ffffff18'/%3E%3C/svg%3E", role: "gallery" }];
-  }, [project]);
+  }, [project, activeLot, selectedLotIdx]);
 
   // Backward-compat: images array for before/after slider
   const images = useMemo(() => galleryItems.filter(i => i.type === "image").map(i => i.url), [galleryItems]);
@@ -93,6 +94,27 @@ export default function ProjectDetails() {
   const [activeIdx, setActiveIdx] = useState(0);
   const videoRef = useRef(null);
   const [tab, setTab] = useState("overview"); // overview | features | technical
+  const [selectedLotIdx, setSelectedLotIdx] = useState(null); // null = lot principal
+
+  // Computed: active lot data (merges project fields with lot-specific overrides)
+  const activeLot = useMemo(() => {
+    if (!project) return null;
+    const lots = project.lots || [];
+    if (selectedLotIdx === null || !lots[selectedLotIdx]) {
+      // Main lot = project itself
+      return {
+        label:       project.title,
+        shortDesc:   project.shortDesc,
+        description: project.description,
+        pricing:     project.pricing,
+        image:       project.image,
+        overview:    project.overview,
+        features:    project.features,
+        modelUrl:    project.modelUrl,
+      };
+    }
+    return lots[selectedLotIdx];
+  }, [project, selectedLotIdx]);
 
   useEffect(() => {
     let cancelled = false;
@@ -155,8 +177,9 @@ export default function ProjectDetails() {
 
   if (!project) return null;
 
-  const price = moneyUSD(project?.pricing?.cents) || "130 $";
+  const price = moneyUSD(activeLot?.pricing?.cents) || "";
   const tags = (project.tags || []).slice(0, 6);
+  const hasLots = Array.isArray(project.lots) && project.lots.length > 0;
 
   const pageUrl = typeof window !== "undefined" ? window.location.href : "";
   const ogImage = project.image || images[0] || "";
@@ -289,7 +312,7 @@ export default function ProjectDetails() {
           <div className="mt-6">
             <h3 className="text-lg font-semibold">Description</h3>
             <p className="mt-2 text-white/65 leading-relaxed">
-              {project.description ||
+              {activeLot?.description ||
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris."}
             </p>
           </div>
@@ -322,11 +345,41 @@ export default function ProjectDetails() {
 
         {/* Right: Info / CTA / Tabs */}
         <div className="rounded-2xl border border-white/55 p-5">
+
+          {/* Lot selector */}
+          {hasLots && (
+            <div className="mb-4">
+              <label className="block text-xs text-white/50 mb-1.5 font-medium uppercase tracking-wider">Lot / Version</label>
+              <div className="relative">
+                <select
+                  value={selectedLotIdx === null ? "" : String(selectedLotIdx)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setSelectedLotIdx(v === "" ? null : Number(v));
+                    setActiveIdx(0);
+                    setTab("overview");
+                  }}
+                  className="w-full rounded-xl border border-[#5d5bd6]/50 bg-[#5d5bd6]/10 px-4 py-2.5 text-sm text-white/90 appearance-none outline-none focus:border-[#5d5bd6] focus:ring-1 focus:ring-[#5d5bd6]/40 transition cursor-pointer"
+                >
+                  <option value="" className="bg-[#0f1117]">🎯 {project.title} — Lot principal</option>
+                  {project.lots.filter(l => l.status !== "draft").map((lot, i) => (
+                    <option key={i} value={String(i)} className="bg-[#0f1117]">📦 {lot.label}</option>
+                  ))}
+                </select>
+                <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="text-3xl font-semibold truncate">{project.title}</h1>
+              <h1 className="text-3xl font-semibold truncate">
+                {selectedLotIdx === null ? project.title : activeLot.label}
+              </h1>
               <div className="mt-1 flex items-center gap-3 text-white/70">
-                <span>Price {price}</span>
+                {price && <span>Price {price}</span>}
                 <span className="text-white/35">·</span>
                 <span className="text-sm text-white/50">{viewCount ?? project.views ?? 0} views</span>
                 <span className="text-white/35">·</span>
@@ -340,7 +393,7 @@ export default function ProjectDetails() {
                 </button>
               </div>
               <p className="mt-3 text-white/65 text-sm leading-relaxed">
-                {project.shortDesc ||
+                {activeLot?.shortDesc ||
                   "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut et massa mi. Aliquam in hendrerit urna."}
               </p>
             </div>
@@ -386,8 +439,8 @@ export default function ProjectDetails() {
             <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
               {tab === "overview" && (
                 <div className="space-y-3 text-white/75">
-                  {project.overview?.length > 0 ? (
-                    project.overview.map((item, i) => <CheckLine key={i}>{item}</CheckLine>)
+                  {activeLot?.overview?.length > 0 ? (
+                    activeLot.overview.map((item, i) => <CheckLine key={i}>{item}</CheckLine>)
                   ) : (
                     <p className="text-white/35 text-sm italic">No overview defined.</p>
                   )}
@@ -396,8 +449,8 @@ export default function ProjectDetails() {
 
               {tab === "features" && (
                 <div className="space-y-3 text-white/75">
-                  {project.features?.length > 0 ? (
-                    project.features.map((item, i) => <CheckLine key={i}>{item}</CheckLine>)
+                  {activeLot?.features?.length > 0 ? (
+                    activeLot.features.map((item, i) => <CheckLine key={i}>{item}</CheckLine>)
                   ) : (
                     <p className="text-white/35 text-sm italic">No features defined.</p>
                   )}
