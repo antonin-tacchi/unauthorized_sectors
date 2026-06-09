@@ -258,8 +258,9 @@ function validateForm(form) {
 /* ─── Form constants ────────────────────────────────────────────────────── */
 
 const EMPTY = {
-  title: "", shortDesc: "", description: "",
+  title: "", shortDesc: "", description: "", type: "mapping",
   image: "", mappingType: "", style: "", size: "", performance: "",
+  scriptType: "", language: "", version: "",
   status: "published", "pricing.cents": "", modelUrl: "",
 };
 
@@ -448,8 +449,10 @@ export default function AdminProjectForm() {
         const d = await rp.json();
         setForm({
           title: d.title || "", shortDesc: d.shortDesc || "", description: d.description || "",
+          type: d.type || "mapping",
           image: d.image || "", mappingType: d.mappingType || "", style: d.style || "",
           size: d.size || "", performance: d.performance || "", status: d.status || "published",
+          scriptType: d.scriptType || "", language: d.language || "", version: d.version || "",
           "pricing.cents": d.pricing?.cents ? String(d.pricing.cents) : "",
           modelUrl: d.modelUrl || "",
         });
@@ -509,11 +512,22 @@ export default function AdminProjectForm() {
     setSaving(true);
     const payload = {
       title: form.title, shortDesc: form.shortDesc, description: form.description,
-      image: form.image, mappingType: form.mappingType, style: form.style,
-      size: form.size, performance: form.performance, status: form.status,
+      type: form.type || "mapping",
+      image: form.image, status: form.status,
       tags: selectedTags,
       pricing: { cents: parseInt(form["pricing.cents"] || "0", 10) || 0 },
-      modelUrl: form.modelUrl || "",
+      // mapping-only
+      ...(form.type !== "script" ? {
+        mappingType: form.mappingType, style: form.style,
+        size: form.size, performance: form.performance,
+        modelUrl: form.modelUrl || "",
+      } : {}),
+      // script-only
+      ...(form.type === "script" ? {
+        scriptType: form.scriptType || "",
+        language: form.language || "",
+        version: form.version || "",
+      } : {}),
       overview: overview.filter(Boolean),
       features: features.filter(Boolean),
       technical: {
@@ -561,6 +575,32 @@ export default function AdminProjectForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* ── Type de projet ── */}
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <label className="block text-xs font-semibold uppercase tracking-widest text-white/35 mb-3">Type de projet</label>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { value: "mapping", icon: "🗺️", label: "Mapping / MLO", desc: "Intérieur, extérieur, ymap…" },
+              { value: "script",  icon: "⚙️", label: "Script / Plugin", desc: "QBCore, ESX, Standalone…" },
+            ].map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => set("type", opt.value)}
+                className={`rounded-xl border px-4 py-3 text-left transition ${
+                  form.type === opt.value
+                    ? "border-[#6b5cff] bg-[#6b5cff]/15 text-white"
+                    : "border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:text-white/80"
+                }`}
+              >
+                <div className="text-xl mb-1">{opt.icon}</div>
+                <div className="text-sm font-semibold">{opt.label}</div>
+                <div className="text-xs text-white/40 mt-0.5">{opt.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <Field label="Title *">
           <input required maxLength={100} value={form.title} onChange={(e) => set("title", e.target.value)}
@@ -612,32 +652,69 @@ export default function AdminProjectForm() {
           </div>
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Mapping type">
-            <select value={form.mappingType} onChange={(e) => set("mappingType", e.target.value)} className={selectCls}>
-              <option value="">—</option>
-              {filterOptions.mappingTypes?.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-          </Field>
-          <Field label="Style">
-            <select value={form.style} onChange={(e) => set("style", e.target.value)} className={selectCls}>
-              <option value="">—</option>
-              {filterOptions.styles?.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-          </Field>
-          <Field label="Size">
-            <select value={form.size} onChange={(e) => set("size", e.target.value)} className={selectCls}>
-              <option value="">—</option>
-              {filterOptions.sizes?.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-          </Field>
-          <Field label="Performance">
-            <select value={form.performance} onChange={(e) => set("performance", e.target.value)} className={selectCls}>
-              <option value="">—</option>
-              {filterOptions.performances?.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-          </Field>
-        </div>
+        {/* ── Mapping-only filters ── */}
+        {form.type !== "script" && (
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Mapping type">
+              <select value={form.mappingType} onChange={(e) => set("mappingType", e.target.value)} className={selectCls}>
+                <option value="">—</option>
+                {filterOptions.mappingTypes?.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </Field>
+            <Field label="Style">
+              <select value={form.style} onChange={(e) => set("style", e.target.value)} className={selectCls}>
+                <option value="">—</option>
+                {filterOptions.styles?.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </Field>
+            <Field label="Size">
+              <select value={form.size} onChange={(e) => set("size", e.target.value)} className={selectCls}>
+                <option value="">—</option>
+                {filterOptions.sizes?.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </Field>
+            <Field label="Performance">
+              <select value={form.performance} onChange={(e) => set("performance", e.target.value)} className={selectCls}>
+                <option value="">—</option>
+                {filterOptions.performances?.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </Field>
+          </div>
+        )}
+
+        {/* ── Script-only filters ── */}
+        {form.type === "script" && (
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Framework">
+              <select value={form.scriptType || ""} onChange={(e) => set("scriptType", e.target.value)} className={selectCls}>
+                <option value="">—</option>
+                <option value="qbcore">QBCore</option>
+                <option value="esx">ESX</option>
+                <option value="standalone">Standalone</option>
+                <option value="vrp">vRP</option>
+                <option value="other">Autre</option>
+              </select>
+            </Field>
+            <Field label="Langage">
+              <select value={form.language || ""} onChange={(e) => set("language", e.target.value)} className={selectCls}>
+                <option value="">—</option>
+                <option value="lua">Lua</option>
+                <option value="javascript">JavaScript</option>
+                <option value="other">Autre</option>
+              </select>
+            </Field>
+            <Field label="Version">
+              <input
+                type="text"
+                maxLength={50}
+                value={form.version || ""}
+                onChange={(e) => set("version", e.target.value)}
+                className={inputCls}
+                placeholder="ex: 1.2.0"
+              />
+            </Field>
+          </div>
+        )}
 
         <Field label="Status">
           <select value={form.status} onChange={(e) => set("status", e.target.value)} className={selectCls}>
@@ -655,19 +732,21 @@ export default function AdminProjectForm() {
           <TagPicker selected={selectedTags} onChange={setSelectedTags} availableTags={availableTags} />
         </Field>
 
-        {/* 3D Model — R2 upload via backend */}
-        <Field label="3D Model (.glb)">
-          <ModelUploadButton
-            currentUrl={form.modelUrl}
-            onUploaded={(url) => set("modelUrl", url)}
-            token={token}
-          />
-          {form.modelUrl && (
-            <button type="button" onClick={() => set("modelUrl", "")} className="mt-1 text-xs text-red-400 hover:text-red-300 transition">
-              Remove model
-            </button>
-          )}
-        </Field>
+        {/* 3D Model — Mapping only */}
+        {form.type !== "script" && (
+          <Field label="3D Model (.glb)">
+            <ModelUploadButton
+              currentUrl={form.modelUrl}
+              onUploaded={(url) => set("modelUrl", url)}
+              token={token}
+            />
+            {form.modelUrl && (
+              <button type="button" onClick={() => set("modelUrl", "")} className="mt-1 text-xs text-red-400 hover:text-red-300 transition">
+                Remove model
+              </button>
+            )}
+          </Field>
+        )}
 
         <Field label="Price (cents, 0 = free)">
           <input type="number" min="0" max="999999" value={form["pricing.cents"]} onChange={(e) => set("pricing.cents", e.target.value)}
