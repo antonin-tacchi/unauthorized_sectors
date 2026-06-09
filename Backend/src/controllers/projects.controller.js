@@ -26,8 +26,8 @@ export async function createProject(req, res) {
   try {
     const payload = { ...req.body };
 
-    // mapping-only
-    payload.type = "mapping";
+    // validate type
+    if (!["mapping", "script"].includes(payload.type)) payload.type = "mapping";
 
     if (!payload.slug && payload.title) {
       payload.slug = await generateUniqueSlug(payload.title);
@@ -35,11 +35,13 @@ export async function createProject(req, res) {
 
     payload.titleLower = (payload.title || "").toLowerCase();
 
-    // normalize filter fields (store slugs)
+    // normalize filter fields
     if (payload.mappingType) payload.mappingType = slugify(payload.mappingType);
-    if (payload.style) payload.style = slugify(payload.style);
-    if (payload.size) payload.size = slugify(payload.size);
+    if (payload.style)       payload.style       = slugify(payload.style);
+    if (payload.size)        payload.size        = slugify(payload.size);
     if (payload.performance) payload.performance = slugify(payload.performance);
+    if (payload.scriptType)  payload.scriptType  = slugify(payload.scriptType);
+    if (payload.language)    payload.language    = slugify(payload.language);
 
     payload.tags = normalizeTags(payload.tags);
 
@@ -65,7 +67,10 @@ export async function listProjects(req, res) {
       style = "",
       size = "",
       performance = "",
+      scriptType = "",
+      language = "",
       tag = "",
+      type = "mapping",
     } = req.query;
 
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
@@ -73,14 +78,16 @@ export async function listProjects(req, res) {
     const skip = (pageNum - 1) * limitNum;
 
     const filter = {
-      type: "mapping",
+      type: ["mapping", "script"].includes(type) ? type : "mapping",
       status: "published",
     };
 
     if (mappingType) filter.mappingType = slugify(mappingType);
-    if (style) filter.style = slugify(style);
-    if (size) filter.size = slugify(size);
+    if (style)       filter.style       = slugify(style);
+    if (size)        filter.size        = slugify(size);
     if (performance) filter.performance = slugify(performance);
+    if (scriptType)  filter.scriptType  = slugify(scriptType);
+    if (language)    filter.language    = slugify(language);
 
     if (tag) filter.tags = slugify(tag);
 
@@ -137,7 +144,7 @@ export async function listProjects(req, res) {
 
 export async function getProjectStats(req, res) {
   try {
-    const baseFilter = { type: "mapping", status: "published" };
+    const baseFilter = { status: "published" };
 
     const [total, byMappingType] = await Promise.all([
       Project.countDocuments(baseFilter),
@@ -163,10 +170,7 @@ export async function getProjectStats(req, res) {
 
 export async function getProjectBySlug(req, res) {
   try {
-    const project = await Project.findOne({
-      slug: req.params.slug,
-      type: "mapping",
-    }).lean();
+    const project = await Project.findOne({ slug: req.params.slug }).lean();
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
@@ -204,14 +208,14 @@ export async function incrementView(req, res) {
     }
 
     if (viewCache.has(key) && now - viewCache.get(key) < VIEW_TTL) {
-      const project = await Project.findOne({ slug, type: "mapping" }).select("views").lean();
+      const project = await Project.findOne({ slug }).select("views").lean();
       return res.json({ views: project?.views ?? 0 });
     }
 
     viewCache.set(key, now);
 
     const project = await Project.findOneAndUpdate(
-      { slug, type: "mapping" },
+      { slug },
       { $inc: { views: 1 } },
       { new: true, select: "slug views" }
     ).lean();
@@ -238,6 +242,8 @@ export async function updateProject(req, res) {
     if (payload.style)       payload.style       = slugify(payload.style);
     if (payload.size)        payload.size        = slugify(payload.size);
     if (payload.performance) payload.performance = slugify(payload.performance);
+    if (payload.scriptType)  payload.scriptType  = slugify(payload.scriptType);
+    if (payload.language)    payload.language    = slugify(payload.language);
     if (payload.tags)        payload.tags        = normalizeTags(payload.tags);
 
     const project = await Project.findByIdAndUpdate(

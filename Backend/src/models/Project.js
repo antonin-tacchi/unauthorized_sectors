@@ -6,14 +6,19 @@ const projectSchema = new mongoose.Schema(
 
     slug: { type: String, required: true, unique: true, index: true },
 
-    // Site mapping-only => toujours "mapping"
+    // "mapping" | "script"
     type: { type: String, required: true, default: "mapping", index: true },
 
-    // Filters UI
+    // Mapping-only filters
     mappingType: { type: String, default: "", index: true },   // mlo, interior, ymap...
-    style: { type: String, default: "", index: true },         // modern, classic, cyber...
-    size: { type: String, default: "", index: true },          // small, medium, massive
+    style:       { type: String, default: "", index: true },   // modern, classic, cyber...
+    size:        { type: String, default: "", index: true },   // small, medium, massive
     performance: { type: String, default: "", index: true },   // optimized, balanced, heavy
+
+    // Script-only filters
+    scriptType: { type: String, default: "", index: true },    // qbcore, esx, standalone, vrp, other
+    language:   { type: String, default: "", index: true },    // lua, javascript, other
+    version:    { type: String, default: "" },
 
     // For title sort
     titleLower: { type: String, default: "", index: true },
