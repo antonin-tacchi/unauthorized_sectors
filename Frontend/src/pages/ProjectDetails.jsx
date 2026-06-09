@@ -38,8 +38,13 @@ export default function ProjectDetails() {
   // Each item: { type: "image"|"video"|"3d", url, role }
   const galleryItems = useMemo(() => {
     if (!project || !activeLot) return [];
-    // For secondary lots, use lot image only (no shared media array)
-    const cover = activeLot.image ? [{ type: "image", url: activeLot.image, role: "cover" }] : [];
+    // For secondary lots, use lot images array; for main lot use project media
+    const lotImages = selectedLotIdx !== null
+      ? (activeLot.images || []).filter(Boolean).map((url, i) => ({ type: "image", url, role: i === 0 ? "cover" : "gallery" }))
+      : [];
+    const cover = selectedLotIdx === null && activeLot.image
+      ? [{ type: "image", url: activeLot.image, role: "cover" }]
+      : [];
     const fromMedia = selectedLotIdx === null && Array.isArray(project.media)
       ? project.media
           .filter((m) => m?.url && (m.mediaType === "image" || m.mediaType === "video"))
@@ -47,7 +52,9 @@ export default function ProjectDetails() {
           .map((m) => ({ type: m.mediaType === "video" ? "video" : "image", url: m.url, role: m.role || "gallery" }))
       : [];
     const model3d = activeLot.modelUrl ? [{ type: "3d", url: activeLot.modelUrl, role: "3d" }] : [];
-    const all = [...cover, ...fromMedia, ...model3d];
+    const all = selectedLotIdx !== null
+      ? [...lotImages, ...model3d]
+      : [...cover, ...fromMedia, ...model3d];
     return all.length ? all : [{ type: "image", url: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%23101828'/%3E%3Cpath d='M6 3.5L10 4.5 8 6z' fill='%23ffffff18'/%3E%3Ccircle cx='10' cy='3' r='1' fill='%23ffffff18'/%3E%3C/svg%3E", role: "gallery" }];
   }, [project, activeLot, selectedLotIdx]);
 

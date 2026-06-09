@@ -407,7 +407,7 @@ export default function AdminProjectForm() {
   const [expandedLot, setExpandedLot] = useState(null); // index of expanded lot
 
   function emptyLot() {
-    return { label: "", shortDesc: "", description: "", "pricing.cents": "", image: "", overview: [], features: [], modelUrl: "", status: "published" };
+    return { label: "", shortDesc: "", description: "", "pricing.cents": "", images: [], overview: [], features: [], modelUrl: "", status: "published" };
   }
   function updateLot(idx, key, val) {
     setLots(prev => prev.map((l, i) => i === idx ? { ...l, [key]: val } : l));
@@ -462,7 +462,7 @@ export default function AdminProjectForm() {
         setLots((d.lots || []).map(l => ({
           label: l.label || "", shortDesc: l.shortDesc || "", description: l.description || "",
           "pricing.cents": l.pricing?.cents ? String(l.pricing.cents) : "",
-          image: l.image || "", overview: l.overview || [], features: l.features || [],
+          images: l.images || [], overview: l.overview || [], features: l.features || [],
           modelUrl: l.modelUrl || "", status: l.status || "published",
         })));
         if (rm.ok) {
@@ -526,7 +526,7 @@ export default function AdminProjectForm() {
         shortDesc: l.shortDesc || "",
         description: l.description || "",
         pricing: { cents: parseInt(l["pricing.cents"] || "0", 10) || 0 },
-        image: l.image || "",
+        images: (l.images || []).filter(Boolean),
         overview: (l.overview || []).filter(Boolean),
         features: (l.features || []).filter(Boolean),
         modelUrl: l.modelUrl || "",
@@ -853,15 +853,35 @@ export default function AdminProjectForm() {
                       />
                     </div>
 
-                    {/* Image URL */}
+                    {/* Images du lot */}
                     <div>
-                      <label className="block text-xs text-white/50 mb-1">Image cover (URL)</label>
-                      <input
-                        value={lot.image}
-                        onChange={e => updateLot(idx, "image", e.target.value)}
-                        placeholder="https://..."
-                        className={inputCls}
-                      />
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs text-white/50">Images du lot</label>
+                        <FileUploadButton
+                          accept="image/*"
+                          resourceType="image"
+                          label="+ Upload image"
+                          onUploaded={(url) => updateLot(idx, "images", [...(lot.images || []), url])}
+                        />
+                      </div>
+                      {(lot.images || []).length === 0 && (
+                        <p className="text-xs text-white/25 italic py-1">Aucune image — clique sur "+ Upload image".</p>
+                      )}
+                      <div className="grid grid-cols-3 gap-2 mt-1">
+                        {(lot.images || []).map((url, ii) => (
+                          <div key={ii} className="relative group rounded-lg overflow-hidden border border-white/10 aspect-video bg-black/20">
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                            {ii === 0 && (
+                              <span className="absolute top-1 left-1 rounded bg-[#5d5bd6]/80 px-1.5 py-0.5 text-[10px] font-semibold text-white">Cover</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => updateLot(idx, "images", lot.images.filter((_, j) => j !== ii))}
+                              className="absolute top-1 right-1 rounded bg-black/60 px-1.5 py-0.5 text-xs text-red-400 opacity-0 group-hover:opacity-100 transition"
+                            >✕</button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Overview */}
